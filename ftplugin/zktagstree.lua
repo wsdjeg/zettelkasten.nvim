@@ -17,11 +17,14 @@ vim.opt_local.winfixwidth = true
 
 local hi = require('spacevim.api.vim.highlight')
 
-vim.api.nvim_buf_set_keymap(0, 'n', '<F2>', '', {
+vim.api.nvim_buf_set_keymap(0, 'n', 'q', '', {
   noremap = true,
   silent = true,
   nowait = true,
-  callback = function() end,
+  callback = function()
+      vim.cmd.close()
+
+  end,
 })
 vim.api.nvim_buf_set_keymap(0, 'n', '<Enter>', '', {
   noremap = true,
