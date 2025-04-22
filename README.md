@@ -1,22 +1,20 @@
-# vim-zettelkasten
+# zettelkasten.nvim
 
-> _vim-zettelkasten_ is a [Zettelkasten](https://zettelkasten.de) note taking plugin, which is forked from [zettelkasten.nvim@fe174666](https://github.com/Furkanzmc/zettelkasten.nvim/tree/fe1746666e27c2fcc0e60dc2786cb9983b994759).
-
-[![](https://spacevim.org/img/build-with-SpaceVim.svg)](https://spacevim.org)
-[![GPLv3 License](https://img.spacevim.org/license-GPLv3-blue.svg)](LICENSE)
+> _zettelkasten.nvim_ is a [Zettelkasten](https://zettelkasten.de) note taking plugin, which is forked from [zettelkasten.nvim@fe174666](https://github.com/Furkanzmc/zettelkasten.nvim/tree/fe1746666e27c2fcc0e60dc2786cb9983b994759).
 
 <!-- vim-markdown-toc GFM -->
 
-- [Install](#install)
-- [Usage](#usage)
-- [Screenshots](#screenshots)
-- [Feedback](#feedback)
+* [Install](#install)
+* [Usage](#usage)
+* [Debug](#debug)
+* [Screenshots](#screenshots)
+* [Feedback](#feedback)
 
 <!-- vim-markdown-toc -->
 
 ## Install
 
-1. Using `vim-zettelkasten` in SpaceVim:
+1. Using `zettelkasten.nvim` in SpaceVim:
 
 ```toml
 [[layers]]
@@ -25,12 +23,32 @@
   zettel_template_dir = 'D:\me\zettelkasten_template'
 ```
 
-2. Using `vim-zettelkasten` without SpaceVim:
+2. Using `zettelkasten.nvim` without SpaceVim:
 
 ```vim
-Plug 'wsdjeg/vim-zettelkasten'
+Plug 'wsdjeg/zettelkasten.nvim'
 let g:zettelkasten_directory = 'D:\me\zettelkasten'
 let g:zettelkasten_template_directory = 'D:\me\zettelkasten_template'
+```
+
+3. Using [nvim-plug](https://github.com/wsdjeg/nvim-plug):
+
+```lua
+require('plug').add({
+    {
+        'wsdjeg/zettelkasten.nvim',
+        config_before = function()
+            vim.g.zettelkasten_directory = 'D:/zettelkasten'
+            vim.g.zettelkasten_template_directory = 'D:/zettelkasten_template'
+        end,
+        config = function()
+            vim.keymap.set('n', '<leader>mzb', '<cmd>ZkBrowse<cr>', { silent = true })
+            vim.keymap.set('n', '<leader>mzn', '<cmd>ZkNew<cr>', { silent = true })
+            vim.keymap.set('n', '<leader>mzf', '<cmd>ZkListNotes<cr>', { silent = true })
+            vim.keymap.set('n', '<leader>mzt', '<cmd>ZkListTags<cr>', { silent = true })
+        end,
+    },
+})
 ```
 
 ## Usage
@@ -56,6 +74,16 @@ let g:zettelkasten_template_directory = 'D:\me\zettelkasten_template'
 | `Ctrl-] / K`    | preview note in vim preview-window |
 | `[I`            | list references in quickfix-window |
 
+## Debug
+
+debug zettelkasten.nvim with logger.nvim:
+
+```lua
+require('plug').add({
+    { 'wsdjeg/zettelkasten.nvim', depends = { { 'wsdjeg/logger.nvim' } } },
+})
+```
+
 ## Screenshots
 
 ![](https://wsdjeg.net/images/zkbrowser.png)
@@ -65,6 +93,4 @@ let g:zettelkasten_template_directory = 'D:\me\zettelkasten_template'
 
 ## Feedback
 
-The development of this plugin is in [`SpaceVim/bundle/vim-zettelkasten`](https://github.com/SpaceVim/SpaceVim/tree/master/bundle/vim-zettelkasten) directory.
-
-If you encounter any bugs or have suggestions, please file an issue in the [issue tracker](https://github.com/SpaceVim/SpaceVim/issues)
+If you encounter any bugs or have suggestions, please file an issue in the [issue tracker](https://github.com/wsdjeg/zettelkasten.nvim/issues)

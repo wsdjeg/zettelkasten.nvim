@@ -1,12 +1,12 @@
-*zettelkasten.txt*  vim-zettelkasten
+*zettelkasten.txt*  zettelkasten.nvim
 
 Origin Author:  Furkan Uzumcu
 Maintainer:  Shidong Wang <wsdjeg@outlook.com>
 
-INTRODUCTION                                  *vim-zettelkasten* *zettelkasten*
+INTRODUCTION                                  *zettelkasten.nvim* *zettelkasten*
 ================================================================================
 
-`vim-zettelkasten` is forked from `zettelkasten.nvim`. The goal of this plugin
+This is forked from `Furkanzmc/zettelkasten.nvim@fe174666`. The goal of this plugin
 is to make it easier to use the Zettelkasten note taking system:
 https://zettelkasten.de/introduction/
 
@@ -251,6 +251,6 @@ ABOUT                                                        *zettelkasten-about
 
 Grab the latest version or report a bug on GitHub:
 
-https://github.com/Furkanzmc/zettelkasten.nvim
+https://github.com/wsdjeg/zettelkasten.nvim
 
 vim:tw=80:colorcolumn=81:et:ft=help:norl:
