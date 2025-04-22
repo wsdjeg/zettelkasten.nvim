@@ -1,23 +1,16 @@
 local M = {}
-local log_levels = vim.log.levels
-local s_log_level = log_levels.INFO
-
-local logger = require("spacevim.logger").derive("zettel")
-
-function M.set_level(level)
-    s_log_level = level
-end
-
-function M.notify(msg, level, opts)
-    if level >= s_log_level then
-        local tag = opts.tag or "[zettelkasten]"
-        vim.notify(tag .. " " .. msg, level, opts)
+local logger
+for _, f in ipairs({ 'info', 'debug', 'warn', 'error' }) do
+    M[f] = function(msg)
+        if not logger then
+            pcall(function()
+                logger = require('logger').derive('zettelkasten')
+                logger[f](msg)
+            end)
+        else
+            logger[f](msg)
+        end
     end
 end
-
-function M.info(msg) -- {{{
-    logger.info(msg)
-end
--- }}}
 
 return M

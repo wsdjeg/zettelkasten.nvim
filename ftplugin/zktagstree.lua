@@ -15,7 +15,7 @@ vim.opt_local.buftype = 'nofile'
 vim.opt_local.swapfile = false
 vim.opt_local.winfixwidth = true
 
-local hi = require('spacevim.api.vim.highlight')
+local util = require('zettelkasten.util')
 
 vim.api.nvim_buf_set_keymap(0, 'n', 'q', '', {
   noremap = true,
@@ -50,7 +50,7 @@ vim.api.nvim_buf_set_keymap(0, 'n', '<LeftRelease>', '', {
   silent = true,
   nowait = true,
   callback = function()
-    if hi.syntax_at() == 'zktagstreeOrg' then
+    if util.syntax_at() == 'zktagstreeOrg' then
       require('zettelkasten.sidebar').toggle_folded_key()
     else
       local bufnr = vim.fn.bufnr('zk://browser')
