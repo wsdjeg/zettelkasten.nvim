@@ -1,14 +1,15 @@
 # zettelkasten.nvim
 
-> _zettelkasten.nvim_ is a [Zettelkasten](https://zettelkasten.de) note taking plugin, which is forked from [zettelkasten.nvim@fe174666](https://github.com/Furkanzmc/zettelkasten.nvim/tree/fe1746666e27c2fcc0e60dc2786cb9983b994759).
+> A [Zettelkasten](https://zettelkasten.de) note taking plugin for Neovim
 
 <!-- vim-markdown-toc GFM -->
 
-* [Install](#install)
-* [Usage](#usage)
-* [Debug](#debug)
-* [Screenshots](#screenshots)
-* [Feedback](#feedback)
+- [Install](#install)
+- [Usage](#usage)
+- [Debug](#debug)
+- [Screenshots](#screenshots)
+- [Credits](#credits)
+- [Feedback](#feedback)
 
 <!-- vim-markdown-toc -->
 
@@ -90,6 +91,10 @@ require('plug').add({
 ![](https://wsdjeg.net/images/zettelkasten-tags-sidebar.png)
 ![](https://wsdjeg.net/images/zettelkasten-tags-filter.png)
 ![](https://wsdjeg.net/images/zettelkasten-complete-id.png)
+
+## Credits
+
+- [Furkanzmc/zettelkasten.nvim](https://github.com/Furkanzmc/zettelkasten.nvim)
 
 ## Feedback
 
