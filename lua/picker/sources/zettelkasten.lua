@@ -17,8 +17,8 @@ end
 local widths = {23, 45, -1}
 
 local function format(note)
-   return note.file_name
-   .. string.rep(' ', widths[1] - vim.fn.strdisplaywidth(note.file_name))
+   return vim.fn.fnamemodify(note.file_name, ':t:r')
+   .. string.rep(' ', widths[1] - vim.fn.strdisplaywidth(vim.fn.fnamemodify(note.file_name, ':t:r')))
    .. note.title
    .. string.rep(' ', widths[2] - vim.fn.strdisplaywidth(note.title))
    .. concat_tags(note.tags)
@@ -26,9 +26,10 @@ end
 
 function M.get()
     return vim.tbl_map(function(t)
+        local format_str = format(t)
         return {
             value = t,
-            str = format(t),
+            str = format_str,
             highlight = {
                 {
                     0,
@@ -42,7 +43,7 @@ function M.get()
                 },
                 {
                     widths[1] + widths[2],
-                    -1,
+                    #format_str,
                     'Tag',
                 },
             },
