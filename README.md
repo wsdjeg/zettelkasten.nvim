@@ -4,35 +4,20 @@
 
 <!-- vim-markdown-toc GFM -->
 
-- [Install](#install)
+- [Installation](#installation)
 - [Usage](#usage)
+- [Picker sources](#picker-sources)
 - [Debug](#debug)
 - [Screenshots](#screenshots)
+- [Self-Promotion](#self-promotion)
 - [Credits](#credits)
 - [Feedback](#feedback)
 
 <!-- vim-markdown-toc -->
 
-## Install
+## Installation
 
-1. Using `zettelkasten.nvim` in SpaceVim:
-
-```toml
-[[layers]]
-  name = 'zettelkasten'
-  zettel_dir = 'D:\me\zettelkasten'
-  zettel_template_dir = 'D:\me\zettelkasten_template'
-```
-
-2. Using `zettelkasten.nvim` without SpaceVim:
-
-```vim
-Plug 'wsdjeg/zettelkasten.nvim'
-let g:zettelkasten_directory = 'D:\me\zettelkasten'
-let g:zettelkasten_template_directory = 'D:\me\zettelkasten_template'
-```
-
-3. Using [nvim-plug](https://github.com/wsdjeg/nvim-plug):
+Using [nvim-plug](https://github.com/wsdjeg/nvim-plug):
 
 ```lua
 require('plug').add({
@@ -45,8 +30,6 @@ require('plug').add({
         config = function()
             vim.keymap.set('n', '<leader>mzb', '<cmd>ZkBrowse<cr>', { silent = true })
             vim.keymap.set('n', '<leader>mzn', '<cmd>ZkNew<cr>', { silent = true })
-            vim.keymap.set('n', '<leader>mzf', '<cmd>ZkListNotes<cr>', { silent = true })
-            vim.keymap.set('n', '<leader>mzt', '<cmd>ZkListTags<cr>', { silent = true })
         end,
     },
 })
@@ -56,13 +39,10 @@ require('plug').add({
 
 **Commands:**
 
-| Command           | description                       |
-| ----------------- | --------------------------------- |
-| `:ZkNew`          | create new note                   |
-| `:ZkBrowse`       | list note in browser window       |
-| `:ZkListTags`     | filter tags in telescope          |
-| `:ZkListTemplete` | filte note templates in telescope |
-| `:ZkListNotes`    | filte note title in telescope     |
+| Command     | description                 |
+| ----------- | --------------------------- |
+| `:ZkNew`    | create new note             |
+| `:ZkBrowse` | list note in browser window |
 
 **Key bindings in browser window:**
 
@@ -75,13 +55,34 @@ require('plug').add({
 | `Ctrl-] / K`    | preview note in vim preview-window |
 | `[I`            | list references in quickfix-window |
 
+## Picker sources
+
+zettelkasten.nvim also provides zettelkasten sources for [picker.nvim](https://github.com/wsdjeg/picker.nvim),
+which can be opened by following command:
+
+```
+:Picker <source_name>
+```
+
+| source name      | description                   |
+| ---------------- | ----------------------------- |
+| zettelkasten     | fuzzy find zettelkasten notes |
+| zettelkasten_tag | fuzzy find zettelkasten tags  |
+
 ## Debug
 
 debug zettelkasten.nvim with logger.nvim:
 
 ```lua
 require('plug').add({
-    { 'wsdjeg/zettelkasten.nvim', depends = { { 'wsdjeg/logger.nvim' } } },
+    {
+        'wsdjeg/zettelkasten.nvim',
+        config_before = function()
+            vim.g.zettelkasten_directory = 'D:/zettelkasten'
+            vim.g.zettelkasten_template_directory = 'D:/zettelkasten_template'
+        end,
+        depends = { { 'wsdjeg/logger.nvim' } },
+    },
 })
 ```
 
@@ -91,6 +92,14 @@ require('plug').add({
 ![](https://wsdjeg.net/images/zettelkasten-tags-sidebar.png)
 ![](https://wsdjeg.net/images/zettelkasten-tags-filter.png)
 ![](https://wsdjeg.net/images/zettelkasten-complete-id.png)
+
+## Self-Promotion
+
+Like this plugin? Star the repository on
+GitHub.
+
+Love this plugin? Follow [me](https://wsdjeg.net/) on
+[GitHub](https://github.com/wsdjeg).
 
 ## Credits
 
