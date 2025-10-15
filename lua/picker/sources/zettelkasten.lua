@@ -52,7 +52,7 @@ function M.get()
 end
 
 function M.default_action(entry)
-    vim.cmd('edit ' .. entry.value.file)
+    vim.cmd('edit ' .. entry.value.file_name)
 end
 
 M.preview_win = true
