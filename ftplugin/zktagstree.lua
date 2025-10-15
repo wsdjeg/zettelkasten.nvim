@@ -26,6 +26,15 @@ vim.api.nvim_buf_set_keymap(0, 'n', 'q', '', {
 
   end,
 })
+vim.api.nvim_buf_set_keymap(0, 'n', '<F2>', '', {
+  noremap = true,
+  silent = true,
+  nowait = true,
+  callback = function()
+      vim.cmd.close()
+
+  end,
+})
 vim.api.nvim_buf_set_keymap(0, 'n', '<Enter>', '', {
   noremap = true,
   silent = true,
