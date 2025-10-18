@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.1.0](https://github.com/wsdjeg/zettelkasten.nvim/compare/v1.0.0...v1.1.0) (2025-10-18)
+
+
+### Features
+
+* add zettelkasten source for picker.nvim ([f7e4da4](https://github.com/wsdjeg/zettelkasten.nvim/commit/f7e4da4c593f5a34d72bb8ce92c2deb9cc93a145))
+* add zettelkasten_tags source ([f9d4761](https://github.com/wsdjeg/zettelkasten.nvim/commit/f9d4761b224511ae5122159049ccff8129dbe398))
+* use `<F2>` to toggle zettelkasten tag tree ([f7c7fe2](https://github.com/wsdjeg/zettelkasten.nvim/commit/f7c7fe2f02606b9a34f2344bea139602ce54a550))
+* use api function instead of vim.cmd ([b85dcf4](https://github.com/wsdjeg/zettelkasten.nvim/commit/b85dcf413be3197a81fa5a33bf9c93a1ff2e1e36))
+
+
+### Bug Fixes
+
+* fix highlight range ([d44106b](https://github.com/wsdjeg/zettelkasten.nvim/commit/d44106b9942b70c14b82b2b73f5faf1ed76d766e))
+* fix wrong key ([ae94168](https://github.com/wsdjeg/zettelkasten.nvim/commit/ae94168baf96871ff3010c1d9f5a11440062459d))
+* fix zettelkasten browser ftdetect ([b7fcad9](https://github.com/wsdjeg/zettelkasten.nvim/commit/b7fcad9a8948ae10d109b1e88a5ecc6f5004327b))
+* set buflisted to false on BufEnter ([7d75e96](https://github.com/wsdjeg/zettelkasten.nvim/commit/7d75e9632ff0d41671a1d94bb7a703f17505343e))
+
 ## 1.0.0 (2025-10-12)
 
 
