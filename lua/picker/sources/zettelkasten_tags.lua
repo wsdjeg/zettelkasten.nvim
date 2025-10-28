@@ -1,6 +1,8 @@
 local M = {}
 local browser = require('zettelkasten.browser')
 
+local previewer = require('picker.previewer.buffer')
+
 local function unique_string_table(t)
     local temp = {}
     for _, k in ipairs(t) do
@@ -32,6 +34,15 @@ end
 
 function M.default_action(entry)
     vim.cmd('ZkBrowse --tags ' .. entry.str)
+end
+
+M.preview_win = true
+
+---@field item PickerItem
+function M.preview(item, win, buf)
+    previewer.buflines = require('zettelkasten').get_note_browser_content({ tags = { item.str } })
+    previewer.filetype = 'zkbrowser'
+    previewer.preview(1, win, buf, true)
 end
 
 return M
