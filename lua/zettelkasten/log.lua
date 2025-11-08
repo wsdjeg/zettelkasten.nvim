@@ -13,4 +13,18 @@ for _, f in ipairs({ 'info', 'debug', 'warn', 'error' }) do
     end
 end
 
+local nt
+
+function M.notify(msg)
+	if not nt then
+		pcall(function()
+			nt = require("notify")
+		end)
+	end
+	if not nt then
+		return
+	end
+	nt.notify(msg)
+end
+
 return M
