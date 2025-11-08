@@ -38,7 +38,7 @@ local function read_note(file_path, line_count)
     assert(file:read(0) ~= nil)
 
     if line_count == nil then
-        return file:read('*all')
+        return vim.split(file:read('*all'), '\n')
     end
 
     local lines = {}
