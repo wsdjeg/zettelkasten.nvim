@@ -9,7 +9,11 @@ local M = {}
 local api = vim.api
 local fn = vim.fn
 
-local log_levels = vim.log.levels
+local log_highlights = {
+    INFO = 'Normal',
+    ERROR = 'Error',
+    WARN = 'WarningMsg'
+}
 local log = require('zettelkasten.log')
 local config = require('zettelkasten.config')
 local formatter = require('zettelkasten.formatter')
@@ -106,7 +110,7 @@ function M.set_note_id(bufnr)
     api.nvim_buf_set_lines(bufnr, 0, 1, true, { '# ' .. zk_id .. ' ' .. first_line })
     vim.cmd('file ' .. zk_id .. '.md')
   else
-    log.notify("There's already a note with the same ID.", log_levels.ERROR, {})
+    log.notify("There's already a note with the same ID.", log_highlights.WARN, {})
   end
 end
 
@@ -162,7 +166,7 @@ function M.keyword_expr(word, opts)
 
   local note = browser.get_note(word)
   if note == nil then
-    log.notify('Cannot find note.', log_levels.ERROR, {})
+    log.notify('Cannot find note.', log_highlights.WARN, {})
     return {}
   end
 
@@ -211,7 +215,7 @@ function M.show_back_references(cword, use_loclist)
   use_loclist = use_loclist or false
   local references = M.get_back_references(cword)
   if #references == 0 then
-    log.notify('No back references found.', log_levels.ERROR, {})
+    log.notify('No back references found.', log_highlights.WARN, {})
     return
   end
 
@@ -259,7 +263,7 @@ end
 
 function M.get_note_browser_content(opt)
   if config.zettel_dir == '' then
-    log.notify("'notes_path' option is required for note browsing.", log_levels.WARN, {})
+    log.notify("'notes_path' option is required for note browsing.", log_highlights.WARN, {})
     return {}
   end
   local filter_tags = {}
@@ -325,7 +329,7 @@ function M._internal_execute_hover_cmd(args)
     return_lines = vim.tbl_contains(args, '-return-lines'),
   })
   if #lines > 0 then
-    log.notify(table.concat(lines, '\n'), log_levels.INFO, {})
+    log.notify(table.concat(lines, '\n'), log_highlights.INFO, {})
   end
 end
 

@@ -15,7 +15,7 @@ end
 
 local nt
 
-function M.notify(msg)
+function M.notify(msg, highlight)
 	if not nt then
 		pcall(function()
 			nt = require("notify")
@@ -24,7 +24,7 @@ function M.notify(msg)
 	if not nt then
 		return
 	end
-	nt.notify(msg)
+	nt.notify(msg, highlight)
 end
 
 return M
