@@ -77,10 +77,6 @@ debug zettelkasten.nvim with logger.nvim:
 require('plug').add({
     {
         'wsdjeg/zettelkasten.nvim',
-        config_before = function()
-            vim.g.zettelkasten_directory = 'D:/zettelkasten'
-            vim.g.zettelkasten_template_directory = 'D:/zettelkasten_template'
-        end,
         depends = { { 'wsdjeg/logger.nvim' } },
     },
 })
