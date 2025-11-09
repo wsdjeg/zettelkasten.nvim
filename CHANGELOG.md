@@ -1,5 +1,38 @@
 # Changelog
 
+## [2.0.0](https://github.com/wsdjeg/zettelkasten.nvim/compare/v1.0.0...v2.0.0) (2025-11-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* use setup instead of vim.g.var
+
+### Features
+
+* add notify function ([5874e1f](https://github.com/wsdjeg/zettelkasten.nvim/commit/5874e1fc9561fe89f1aacd8ffdf2a39224e3512b))
+* add option to set completion kind ([0a7ccc6](https://github.com/wsdjeg/zettelkasten.nvim/commit/0a7ccc69b7e12905b349aa010ad17f03e43c2e95))
+* add zettelkasten source for picker.nvim ([f7e4da4](https://github.com/wsdjeg/zettelkasten.nvim/commit/f7e4da4c593f5a34d72bb8ce92c2deb9cc93a145))
+* add zettelkasten_tags source ([f9d4761](https://github.com/wsdjeg/zettelkasten.nvim/commit/f9d4761b224511ae5122159049ccff8129dbe398))
+* enable notify highlight ([41a90ea](https://github.com/wsdjeg/zettelkasten.nvim/commit/41a90ea7b0d0113722ef4d17f4ca55855d4e6922))
+* improve ZkHover command ([62ddf8f](https://github.com/wsdjeg/zettelkasten.nvim/commit/62ddf8f88d3af245506b6aa95412e78a12390a9c))
+* support zk tags preview ([448fae3](https://github.com/wsdjeg/zettelkasten.nvim/commit/448fae3579fa91f7c9445ce852732aea31b791d2))
+* use `<F2>` to toggle zettelkasten tag tree ([f7c7fe2](https://github.com/wsdjeg/zettelkasten.nvim/commit/f7c7fe2f02606b9a34f2344bea139602ce54a550))
+* use api function instead of vim.cmd ([b85dcf4](https://github.com/wsdjeg/zettelkasten.nvim/commit/b85dcf413be3197a81fa5a33bf9c93a1ff2e1e36))
+* use setup instead of vim.g.var ([ce3212e](https://github.com/wsdjeg/zettelkasten.nvim/commit/ce3212efc20615b756ddb4d662fe669f17e5f03e))
+
+
+### Bug Fixes
+
+* fix completion_kind setup ([6e78379](https://github.com/wsdjeg/zettelkasten.nvim/commit/6e78379102d7cad2d367b083e26c4274076504e5))
+* fix highlight range ([d44106b](https://github.com/wsdjeg/zettelkasten.nvim/commit/d44106b9942b70c14b82b2b73f5faf1ed76d766e))
+* fix setup function ([0342f65](https://github.com/wsdjeg/zettelkasten.nvim/commit/0342f65337e270ebfdb0de29471f185ee51cea7f))
+* fix wrong key ([ae94168](https://github.com/wsdjeg/zettelkasten.nvim/commit/ae94168baf96871ff3010c1d9f5a11440062459d))
+* fix zettelkasten browser ftdetect ([b7fcad9](https://github.com/wsdjeg/zettelkasten.nvim/commit/b7fcad9a8948ae10d109b1e88a5ecc6f5004327b))
+* fix zknew completion ([e9d8946](https://github.com/wsdjeg/zettelkasten.nvim/commit/e9d89463e3a4c0ed3737e345bfcfd916e07e221a))
+* make read_note return table ([b663938](https://github.com/wsdjeg/zettelkasten.nvim/commit/b663938e1151c33e2bae11d2b5832f4d930df780))
+* only set zk ftplugin for zettelkasten file ([760f354](https://github.com/wsdjeg/zettelkasten.nvim/commit/760f3540bb74aa183967f9522f79628f4afb2c74))
+* set buflisted to false on BufEnter ([7d75e96](https://github.com/wsdjeg/zettelkasten.nvim/commit/7d75e9632ff0d41671a1d94bb7a703f17505343e))
+
 ## 1.0.0 (2025-10-12)
 
 
