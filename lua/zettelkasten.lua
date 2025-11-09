@@ -342,6 +342,7 @@ function M._internal_execute_hover_cmd(args)
 end
 
 function M.zknew(opt) -- {{{
+    opt = opt or {}
     local buf = vim.api.nvim_create_buf(true, false)
     vim.api.nvim_open_win(buf, true, { split = 'above' })
 
@@ -352,7 +353,13 @@ function M.zknew(opt) -- {{{
         vim.cmd('lcd ' .. config.notes_path)
     end
 
-    vim.cmd('normal ggI# New Note')
+    if opt.template then
+        local templete_context = vim.fn.readfile(opt.template, '')
+        vim.api.nvim_buf_set_lines(0, 0, -1, false, templete_context)
+    else
+        vim.cmd('normal ggI# New Note')
+    end
+
     M.set_note_id(buf)
     vim.cmd('normal $')
 end

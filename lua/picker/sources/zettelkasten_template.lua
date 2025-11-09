@@ -14,7 +14,11 @@ function M.get()
 end
 
 ---@field item PickerItem
-function M.default_action(item) end
+function M.default_action(item)
+    require('zettelkasten').zknew({
+        template = item.value
+    })
+end
 
 M.preview_win = true
 
