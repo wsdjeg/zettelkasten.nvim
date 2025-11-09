@@ -263,7 +263,7 @@ function M.get_toc(note_id, format)
 end
 
 function M.get_note_browser_content(opt)
-    if config.zettel_dir == '' then
+    if config.notes_path == '' then
         log.notify("'notes_path' option is required for note browsing.", log_highlights.WARN, {})
         return {}
     end
@@ -345,11 +345,11 @@ function M.zknew(opt) -- {{{
     local buf = vim.api.nvim_create_buf(true, false)
     vim.api.nvim_open_win(buf, true, { split = 'above' })
 
-    if config.zettel_dir ~= '' then
-        if vim.fn.isdirectory(config.zettel_dir) == 0 then
-            vim.fn.mkdir(vim.fn.expand(config.zettel_dir), 'p', '0700')
+    if config.notes_path ~= '' then
+        if vim.fn.isdirectory(config.notes_path) == 0 then
+            vim.fn.mkdir(vim.fn.expand(config.notes_path), 'p', '0700')
         end
-        vim.cmd('lcd ' .. config.zettel_dir)
+        vim.cmd('lcd ' .. config.notes_path)
     end
 
     vim.cmd('normal ggI# New Note')

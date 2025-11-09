@@ -7,9 +7,9 @@
 --=============================================================================
 local M = {}
 
-M.zettel_dir = '~/.zettelkasten/'
+M.notes_path = '~/.zettelkasten/'
 
-M.templete_dir = '~/.zettelkasten_template'
+M.template_dir = '~/.zettelkasten_template'
 
 M.browseformat = '%f - %h [%r Refs] [%b B-Refs] %t'
 M.preview_command = 'pedit'
@@ -17,10 +17,11 @@ M.completion_kind = '[zettelkasten]'
 
 M._set = function(opts)
     opts = opts or {}
-    M.zettel_dir = opts.notes_path or M.zettel_dir
+    M.notes_path = opts.notes_path or M.notes_path
     M.preview_command = opts.preview_command or M.preview_command
     M.browseformat = opts.browseformat or M.browseformat
     M.completion_kind = opts.completion_kind or M.completion_kind
+    M.templates_path = opts.templates_path or M.templates_path
 end
 
 return M

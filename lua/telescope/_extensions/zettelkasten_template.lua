@@ -8,7 +8,7 @@ local zk_config = require("zettelkasten.config")
 
 local function prepare_output_table()
     local lines = {}
-    local result = vim.fn.globpath(zk_config.templete_dir, '**/*', 0, 1)
+    local result = vim.fn.globpath(zk_config.templates_path, '**/*', 0, 1)
 
     for _, templete in ipairs(result) do
       table.insert(lines, templete)

@@ -26,7 +26,9 @@ require('plug').add({
         config = function()
             require('zettelkasten').setup({
                 notes_path = '~/.zettelkasten',
-                note_templates_path = '~/.zettelkasten_template',
+                templates_path = '~/.zettelkasten_template',
+                preview_command = 'pedit',
+                browseformat = '%f - %h [%r Refs] [%b B-Refs] %t',
             })
             vim.keymap.set('n', '<leader>mzb', '<cmd>ZkBrowse<cr>', { silent = true })
             vim.keymap.set('n', '<leader>mzn', '<cmd>ZkNew<cr>', { silent = true })

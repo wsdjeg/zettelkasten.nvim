@@ -176,7 +176,7 @@ function M.get_note(id)
 end
 
 function M.get_notes()
-  local folder = config.zettel_dir
+  local folder = config.notes_path
   local files = get_files(folder)
   local all_notes = {}
   for _, file in ipairs(files) do

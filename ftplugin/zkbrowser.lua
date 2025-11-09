@@ -82,8 +82,8 @@ if vim.fn.mapcheck('[I', 'n') == '' then
 end
 
 local config = require('zettelkasten.config')
-if config.zettel_dir ~= '' then
-    vim.cmd('lcd ' .. config.zettel_dir)
+if config.notes_path ~= '' then
+    vim.cmd('lcd ' .. config.notes_path)
 end
 
 --- what the fuck why ctrl-o change the buflisted opt?
