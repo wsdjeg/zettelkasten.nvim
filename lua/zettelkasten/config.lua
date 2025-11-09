@@ -7,24 +7,12 @@
 --=============================================================================
 local M = {}
 
-if vim.g.zettelkasten_directory and vim.g.zettelkasten_directory ~= '' then
-    M.zettel_dir = vim.g.zettelkasten_directory
-else
-    M.zettel_dir = '~/.zettelkasten/'
-end
+M.zettel_dir = '~/.zettelkasten/'
 
-if vim.g.zettelkasten_template_directory and vim.g.zettelkasten_template_directory ~= '' then
-    M.templete_dir = vim.g.zettelkasten_template_directory
-else
-    M.templete_dir = '~/.zettelkasten_template'
-end
+M.templete_dir = '~/.zettelkasten_template'
 
 M.browseformat = '%f - %h [%r Refs] [%b B-Refs] %t'
 M.preview_command = 'pedit'
-
-M.get = function()
-    return nil
-end
 
 M._set = function(opts)
     opts = opts or {}

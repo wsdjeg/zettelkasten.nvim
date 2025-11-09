@@ -125,11 +125,12 @@ setup({opts})                                                *zettelkasten-setup
 
     Parameters: ~
         {opts} (optional, table)
-            - {notes_path} (optional, string): Defaults to an empty string. If
-              provided, |:ZkNew| uses the notes path to set the working
-              directory. If this is not set. you need to make sure that your
-              working directory is your notes directory. Otherwise some
-              features may not work.
+            - {notes_path} (optional, string): By default it is `~/.zettelkasten`.
+              If provided, |:ZkNew| uses the notes path to set the working
+              directory. If this is not set, the default notes_path will be
+              used.
+            - {templates_path} (optional, string): By default it is
+              `~/.zettelkasten_template`.
             - {preview_command} (optional, string): The command to use to
               preview a note. This will be used with |:ZkHover -preview|
               command. The command must take one string argument as the name
