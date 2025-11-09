@@ -20,6 +20,7 @@ M._set = function(opts)
     M.zettel_dir = opts.notes_path or M.zettel_dir
     M.preview_command = opts.preview_command or M.preview_command
     M.browseformat = opts.browseformat or M.browseformat
+    M.completion_kind = opts.completion_kind or M.completion_kind
 end
 
 return M
