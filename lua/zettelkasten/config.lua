@@ -13,6 +13,7 @@ M.templete_dir = '~/.zettelkasten_template'
 
 M.browseformat = '%f - %h [%r Refs] [%b B-Refs] %t'
 M.preview_command = 'pedit'
+M.completion_kind = '[zettelkasten]'
 
 M._set = function(opts)
     opts = opts or {}

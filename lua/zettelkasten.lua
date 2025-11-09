@@ -94,7 +94,7 @@ function M.completefunc(find_start, base)
             abbr = ref.title,
             dup = 0,
             empty = 0,
-            kind = '[zettelkasten]',
+            kind = config.completion_kind,
             icase = 1,
         })
     end
