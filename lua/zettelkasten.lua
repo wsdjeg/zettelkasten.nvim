@@ -108,7 +108,8 @@ function M.set_note_id(bufnr)
     if #zk_id > 0 then
         first_line, _ = string.gsub(first_line, '# ', '')
         api.nvim_buf_set_lines(bufnr, 0, 1, true, { '# ' .. zk_id .. ' ' .. first_line })
-        vim.cmd('file ' .. zk_id .. '.md')
+        vim.api.nvim_buf_set_name(bufnr, zk_id .. '.md')
+        vim.api.nvim_set_option_value('filetype', 'markdown', { buf = bufnr })
     else
         log.notify("There's already a note with the same ID.", log_highlights.WARN, {})
     end
@@ -341,7 +342,9 @@ function M._internal_execute_hover_cmd(args)
 end
 
 function M.zknew(opt) -- {{{
-    vim.cmd([[new | setlocal filetype=markdown]])
+    local buf = vim.api.nvim_create_buf(true, false)
+    vim.api.nvim_open_win(buf, true, { split = 'above' })
+
     if config.zettel_dir ~= '' then
         if vim.fn.isdirectory(config.zettel_dir) == 0 then
             vim.fn.mkdir(vim.fn.expand(config.zettel_dir), 'p', '0700')
@@ -350,7 +353,7 @@ function M.zknew(opt) -- {{{
     end
 
     vim.cmd('normal ggI# New Note')
-    require('zettelkasten').set_note_id(vim.api.nvim_get_current_buf())
+    M.set_note_id(buf)
     vim.cmd('normal $')
 end
 -- }}}
