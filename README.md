@@ -23,11 +23,11 @@ Using [nvim-plug](https://github.com/wsdjeg/nvim-plug):
 require('plug').add({
     {
         'wsdjeg/zettelkasten.nvim',
-        config_before = function()
-            vim.g.zettelkasten_directory = 'D:/zettelkasten'
-            vim.g.zettelkasten_template_directory = 'D:/zettelkasten_template'
-        end,
         config = function()
+            require('zettelkasten').setup({
+                notes_path = '~/.zettelkasten',
+                note_templates_path = '~/.zettelkasten_template',
+            })
             vim.keymap.set('n', '<leader>mzb', '<cmd>ZkBrowse<cr>', { silent = true })
             vim.keymap.set('n', '<leader>mzn', '<cmd>ZkNew<cr>', { silent = true })
         end,
