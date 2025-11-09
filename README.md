@@ -1,6 +1,11 @@
 # zettelkasten.nvim
 
-> A [Zettelkasten](https://zettelkasten.de) note taking plugin for Neovim
+A [Zettelkasten](https://zettelkasten.de) note taking plugin for Neovim
+
+[![GitHub License](https://img.shields.io/github/license/wsdjeg/zettelkasten.nvim)](LICENSE)
+[![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/wsdjeg/zettelkasten.nvim)](https://github.com/wsdjeg/zettelkasten.nvim/issues)
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/wsdjeg/zettelkasten.nvim)](https://github.com/wsdjeg/zettelkasten.nvim/commits/master/)
+[![GitHub Release](https://img.shields.io/github/v/release/wsdjeg/zettelkasten.nvim)](https://github.com/wsdjeg/zettelkasten.nvim/releases)
 
 <!-- vim-markdown-toc GFM -->
 
