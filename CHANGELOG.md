@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.1.0](https://github.com/wsdjeg/zettelkasten.nvim/compare/v2.0.0...v2.1.0) (2025-11-09)
+
+
+### Features
+
+* add zk templates source ([7654459](https://github.com/wsdjeg/zettelkasten.nvim/commit/7654459b78b722810fec29ccdf7b11530727f212))
+
+
+### Bug Fixes
+
+* fix default action of zettelkasten_template ([52d811d](https://github.com/wsdjeg/zettelkasten.nvim/commit/52d811d14d044047f8c7615cef08b75030b2fccf))
+
 ## [2.0.0](https://github.com/wsdjeg/zettelkasten.nvim/compare/v1.0.0...v2.0.0) (2025-11-09)
 
 
