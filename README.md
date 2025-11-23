@@ -6,6 +6,7 @@ A [Zettelkasten](https://zettelkasten.de) note taking plugin for Neovim
 [![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/wsdjeg/zettelkasten.nvim)](https://github.com/wsdjeg/zettelkasten.nvim/issues)
 [![GitHub commit activity](https://img.shields.io/github/commit-activity/m/wsdjeg/zettelkasten.nvim)](https://github.com/wsdjeg/zettelkasten.nvim/commits/master/)
 [![GitHub Release](https://img.shields.io/github/v/release/wsdjeg/zettelkasten.nvim)](https://github.com/wsdjeg/zettelkasten.nvim/releases)
+[![luarocks](https://img.shields.io/luarocks/v/wsdjeg/zettelkasten.nvim)](https://luarocks.org/modules/wsdjeg/zettelkasten.nvim)
 
 <!-- vim-markdown-toc GFM -->
 
@@ -40,6 +41,12 @@ require('plug').add({
         end,
     },
 })
+```
+
+Using [luarocks](https://luarocks.org/)
+
+```
+luarocks install zettelkasten.nvim
 ```
 
 ## Usage
