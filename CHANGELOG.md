@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.1.0](https://github.com/wsdjeg/zettelkasten.nvim/compare/v2.0.0...v2.1.0) (2025-11-23)
+
+
+### Features
+
+* add luarocks support ([fa2b4f5](https://github.com/wsdjeg/zettelkasten.nvim/commit/fa2b4f553a02d6e67716ac3ae66d9714c10f7f0f))
+* add zk templates source ([7654459](https://github.com/wsdjeg/zettelkasten.nvim/commit/7654459b78b722810fec29ccdf7b11530727f212))
+* use lua syntax file ([c0a5d0b](https://github.com/wsdjeg/zettelkasten.nvim/commit/c0a5d0b07382a59480553378252c4bcaa63a289f))
+
+
+### Bug Fixes
+
+* fix default action of zettelkasten_template ([52d811d](https://github.com/wsdjeg/zettelkasten.nvim/commit/52d811d14d044047f8c7615cef08b75030b2fccf))
+
 ## [2.0.0](https://github.com/wsdjeg/zettelkasten.nvim/compare/v1.0.0...v2.0.0) (2025-11-09)
 
 
