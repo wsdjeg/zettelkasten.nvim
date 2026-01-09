@@ -73,7 +73,13 @@ local function update_sidebar_context()
   for _, tag in ipairs(result) do
     table.insert(lines, tag.name)
   end
-  vim.api.nvim_buf_set_lines(0, 0, -1, false, sort_tags(unique_string_table(lines)))
+  vim.api.nvim_buf_set_lines(
+    0,
+    0,
+    -1,
+    false,
+    sort_tags(unique_string_table(lines))
+  )
   vim.opt_local.buflisted = false
   vim.opt_local.modifiable = false
 end

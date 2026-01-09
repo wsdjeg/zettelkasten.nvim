@@ -1,5 +1,5 @@
 if vim.b.did_ftp == true then
-    return
+  return
 end
 
 vim.opt_local.cursorline = true
@@ -20,70 +20,72 @@ local util = require('zettelkasten.util')
 require('zettelkasten').add_hover_command()
 
 if vim.fn.mapcheck('[I', 'n') == '' then
-    vim.api.nvim_buf_set_keymap(
-        0,
-        'n',
-        '[I',
-        '<CMD>lua require("zettelkasten").show_back_references(vim.fn.expand("<cword>"))<CR>',
-        { noremap = true, silent = true, nowait = true }
-    )
-    vim.api.nvim_buf_set_keymap(0, 'n', 'q', '', {
-        noremap = true,
-        silent = true,
-        nowait = true,
-        callback = function()
-            if vim.fn.tabpagenr('$') > 1 and util.is_last_win() then
-                vim.cmd('quit')
-                return
-            end
-            local ok = pcall(function()
-                vim.cmd('b#')
-            end)
+  vim.api.nvim_buf_set_keymap(
+    0,
+    'n',
+    '[I',
+    '<CMD>lua require("zettelkasten").show_back_references(vim.fn.expand("<cword>"))<CR>',
+    { noremap = true, silent = true, nowait = true }
+  )
+  vim.api.nvim_buf_set_keymap(0, 'n', 'q', '', {
+    noremap = true,
+    silent = true,
+    nowait = true,
+    callback = function()
+      if vim.fn.tabpagenr('$') > 1 and util.is_last_win() then
+        vim.cmd('quit')
+        return
+      end
+      local ok = pcall(function()
+        vim.cmd('b#')
+      end)
 
-            if not ok then
-                vim.cmd('bd')
-            end
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(0, 'n', '<C-l>', '', {
-        noremap = true,
-        silent = true,
-        nowait = true,
-        callback = function()
-            vim.cmd('ZkBrowse')
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(0, 'n', '<LeftRelease>', '', {
-        noremap = true,
-        silent = true,
-        nowait = true,
-        callback = function()
-            if util.syntax_at() == 'ZettelKastenTags' then
-                vim.cmd('ZkBrowse #' .. vim.fn.expand('<cword>'))
-            end
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(0, 'n', '<F2>', '', {
-        noremap = true,
-        silent = true,
-        nowait = true,
-        callback = function()
-            require('zettelkasten.sidebar').open_tag_tree()
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(0, 'n', '<Enter>', '', {
-        noremap = true,
-        silent = true,
-        nowait = true,
-        callback = function()
-            vim.cmd('normal 0gf')
-        end,
-    })
+      if not ok then
+        vim.cmd('bd')
+      end
+    end,
+  })
+  vim.api.nvim_buf_set_keymap(0, 'n', '<C-l>', '', {
+    noremap = true,
+    silent = true,
+    nowait = true,
+    callback = function()
+      vim.cmd('ZkBrowse')
+    end,
+  })
+  vim.api.nvim_buf_set_keymap(0, 'n', '<LeftRelease>', '', {
+    noremap = true,
+    silent = true,
+    nowait = true,
+    callback = function()
+      if util.syntax_at() == 'ZettelKastenTags' then
+        require('zettelkasten.browser').browse({
+          tags = { '#' .. vim.fn.expand('<cword>') },
+        })
+      end
+    end,
+  })
+  vim.api.nvim_buf_set_keymap(0, 'n', '<F2>', '', {
+    noremap = true,
+    silent = true,
+    nowait = true,
+    callback = function()
+      require('zettelkasten.sidebar').open_tag_tree()
+    end,
+  })
+  vim.api.nvim_buf_set_keymap(0, 'n', '<Enter>', '', {
+    noremap = true,
+    silent = true,
+    nowait = true,
+    callback = function()
+      vim.cmd('normal 0gf')
+    end,
+  })
 end
 
 local config = require('zettelkasten.config')
 if config.notes_path ~= '' then
-    vim.cmd('lcd ' .. config.notes_path)
+  vim.cmd('lcd ' .. config.notes_path)
 end
 
 --- what the fuck why ctrl-o change the buflisted opt?
@@ -91,9 +93,9 @@ end
 local ns = vim.api.nvim_create_augroup('zkbrowser', { clear = true })
 
 vim.api.nvim_create_autocmd({ 'BufEnter' }, {
-    group = ns,
-    buffer = vim.api.nvim_get_current_buf(),
-    callback = function(ev)
-        vim.api.nvim_set_option_value('buflisted', false, { buf = ev.buf })
-    end,
+  group = ns,
+  buffer = vim.api.nvim_get_current_buf(),
+  callback = function(ev)
+    vim.api.nvim_set_option_value('buflisted', false, { buf = ev.buf })
+  end,
 })

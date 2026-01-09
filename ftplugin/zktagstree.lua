@@ -22,8 +22,7 @@ vim.api.nvim_buf_set_keymap(0, 'n', 'q', '', {
   silent = true,
   nowait = true,
   callback = function()
-      vim.cmd.close()
-
+    vim.cmd.close()
   end,
 })
 vim.api.nvim_buf_set_keymap(0, 'n', '<F2>', '', {
@@ -31,8 +30,7 @@ vim.api.nvim_buf_set_keymap(0, 'n', '<F2>', '', {
   silent = true,
   nowait = true,
   callback = function()
-      vim.cmd.close()
-
+    vim.cmd.close()
   end,
 })
 vim.api.nvim_buf_set_keymap(0, 'n', '<Enter>', '', {
@@ -48,7 +46,9 @@ vim.api.nvim_buf_set_keymap(0, 'n', '<Enter>', '', {
         0,
         -1,
         false,
-        require('zettelkasten').get_note_browser_content({ tags = { vim.fn.trim(vim.fn.getline('.')) } })
+        require('zettelkasten').get_note_browser_content({
+          tags = { vim.fn.trim(vim.fn.getline('.')) },
+        })
       )
     end
     vim.api.nvim_set_option_value('modifiable', false, { buf = bufnr })
@@ -70,7 +70,9 @@ vim.api.nvim_buf_set_keymap(0, 'n', '<LeftRelease>', '', {
           0,
           -1,
           false,
-          require('zettelkasten').get_note_browser_content({ tags = { vim.fn.trim(vim.fn.getline('.')) } })
+          require('zettelkasten').get_note_browser_content({
+            tags = { vim.fn.trim(vim.fn.getline('.')) },
+          })
         )
       end
       vim.api.nvim_set_option_value('modifiable', false, { buf = bufnr })

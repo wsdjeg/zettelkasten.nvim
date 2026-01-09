@@ -98,10 +98,12 @@ local function extract_tags(line, linenr)
 end
 
 local function get_note_information(file_path)
-  local last_modified = fn.strftime('%Y-%m-%d.%H:%M:%S', fn.getftime(file_path))
+  local last_modified =
+    fn.strftime('%Y-%m-%d.%H:%M:%S', fn.getftime(file_path))
   if
     s_note_cache_with_file_path[file_path] ~= nil
-    and s_note_cache_with_file_path[file_path].last_modified == last_modified
+    and s_note_cache_with_file_path[file_path].last_modified
+      == last_modified
   then
     return s_note_cache_with_file_path[file_path]
   end
@@ -225,6 +227,7 @@ function M.get_tags()
 end
 
 function M.browse(opt)
+  opt = opt or {}
   vim.cmd('edit zk://browser')
   vim.opt_local.syntax = ''
   vim.opt_local.modifiable = true
@@ -233,7 +236,10 @@ function M.browse(opt)
     0,
     -1,
     false,
-    require('zettelkasten').get_note_browser_content({ tags = opt })
+    require('zettelkasten').get_note_browser_content({
+      tags = opt.tags or {},
+      date = opt.date,
+    })
   )
   vim.opt_local.syntax = 'zkbrowser'
   vim.opt_local.buflisted = false

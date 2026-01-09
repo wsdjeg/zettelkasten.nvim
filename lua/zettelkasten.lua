@@ -10,9 +10,9 @@ local api = vim.api
 local fn = vim.fn
 
 local log_highlights = {
-    INFO = 'Normal',
-    ERROR = 'Error',
-    WARN = 'WarningMsg',
+  INFO = 'Normal',
+  ERROR = 'Error',
+  WARN = 'WarningMsg',
 }
 local log = require('zettelkasten.log')
 local config = require('zettelkasten.config')
@@ -22,354 +22,407 @@ local browser = require('zettelkasten.browser')
 local NOTE_ID_STRFTIME_FORMAT = '%Y-%m-%d-%H-%M-%S'
 
 local function set_qflist(lines, action, bufnr, use_loclist, what)
-    what = what or {}
-    local _, local_efm = pcall(vim.api.nvim_buf_get_option, bufnr, 'errorformat')
-    what.efm = what.efm or local_efm
-    if use_loclist then
-        fn.setloclist(bufnr, lines, action, what)
-    else
-        fn.setqflist(lines, action, what)
-    end
+  what = what or {}
+  local _, local_efm =
+    pcall(vim.api.nvim_buf_get_option, bufnr, 'errorformat')
+  what.efm = what.efm or local_efm
+  if use_loclist then
+    fn.setloclist(bufnr, lines, action, what)
+  else
+    fn.setqflist(lines, action, what)
+  end
 end
 
 local function read_note(file_path, line_count)
-    local file = io.open(file_path, 'r')
-    assert(file ~= nil)
-    assert(file:read(0) ~= nil)
+  local file = io.open(file_path, 'r')
+  assert(file ~= nil)
+  assert(file:read(0) ~= nil)
 
-    if line_count == nil then
-        return vim.split(file:read('*all'), '\n')
+  if line_count == nil then
+    return vim.split(file:read('*all'), '\n')
+  end
+
+  local lines = {}
+  while #lines < line_count do
+    local line = file:read('*line')
+    if line == nil then
+      break
     end
 
-    local lines = {}
-    while #lines < line_count do
-        local line = file:read('*line')
-        if line == nil then
-            break
-        end
+    table.insert(lines, line)
+  end
 
-        table.insert(lines, line)
-    end
-
-    return lines
+  return lines
 end
 
 local function get_all_tags(lookup_tag)
-    if lookup_tag ~= nil and #lookup_tag > 0 then
-        lookup_tag = string.gsub(lookup_tag, '\\<', '')
-        lookup_tag = string.gsub(lookup_tag, '\\>', '')
-    end
+  if lookup_tag ~= nil and #lookup_tag > 0 then
+    lookup_tag = string.gsub(lookup_tag, '\\<', '')
+    lookup_tag = string.gsub(lookup_tag, '\\>', '')
+  end
 
-    local tags = browser.get_tags()
-    if lookup_tag ~= nil and #lookup_tag > 0 then
-        tags = vim.tbl_filter(function(tag)
-            return string.match(tag.name, lookup_tag) ~= nil
-        end, tags)
-    end
+  local tags = browser.get_tags()
+  if lookup_tag ~= nil and #lookup_tag > 0 then
+    tags = vim.tbl_filter(function(tag)
+      return string.match(tag.name, lookup_tag) ~= nil
+    end, tags)
+  end
 
-    return tags
+  return tags
 end
 
-local function generate_note_id()
-    return fn.strftime(NOTE_ID_STRFTIME_FORMAT)
+local function generate_note_id(date)
+  local t = os.date('*t')
+  local note_time = {}
+  note_time.year = date.year or t.year
+  note_time.month = date.month or t.month
+  note_time.day = date.day or t.day
+  note_time.hour = date.hour
+  note_time.min = date.min
+  note_time.sec = date.sec
+  return os.date(NOTE_ID_STRFTIME_FORMAT, os.time(note_time))
 end
 
 function M.completefunc(find_start, base)
-    if find_start == 1 and base == '' then
-        local pos = api.nvim_win_get_cursor(0)
-        local line = api.nvim_get_current_line()
-        local line_to_cursor = line:sub(1, pos[2])
-        return fn.match(line_to_cursor, '\\k*$')
-    end
+  if find_start == 1 and base == '' then
+    local pos = api.nvim_win_get_cursor(0)
+    local line = api.nvim_get_current_line()
+    local line_to_cursor = line:sub(1, pos[2])
+    return fn.match(line_to_cursor, '\\k*$')
+  end
 
-    local notes = vim.tbl_filter(function(note)
-        -- here the note sometimes do not have title, then it is nil
-        return string.match(note.title, base)
-    end, browser.get_notes())
+  local notes = vim.tbl_filter(function(note)
+    -- here the note sometimes do not have title, then it is nil
+    return string.match(note.title, base)
+  end, browser.get_notes())
 
-    local words = {}
-    for _, ref in ipairs(notes) do
-        table.insert(words, {
-            word = ref.id,
-            abbr = ref.title,
-            dup = 0,
-            empty = 0,
-            kind = config.completion_kind,
-            icase = 1,
-        })
-    end
+  local words = {}
+  for _, ref in ipairs(notes) do
+    table.insert(words, {
+      word = ref.id,
+      abbr = ref.title,
+      dup = 0,
+      empty = 0,
+      kind = config.completion_kind,
+      icase = 1,
+    })
+  end
 
-    return words
+  return words
 end
 
-function M.set_note_id(bufnr)
-    local first_line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, true)[1]
-    local zk_id = generate_note_id()
-    if #zk_id > 0 then
-        first_line, _ = string.gsub(first_line, '# ', '')
-        api.nvim_buf_set_lines(bufnr, 0, 1, true, { '# ' .. zk_id .. ' ' .. first_line })
-        vim.api.nvim_buf_set_name(bufnr, zk_id .. '.md')
-        vim.api.nvim_set_option_value('filetype', 'markdown', { buf = bufnr })
-    else
-        log.notify("There's already a note with the same ID.", log_highlights.WARN, {})
-    end
+function M.set_note_id(bufnr, date)
+  local first_line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, true)[1]
+  local zk_id = generate_note_id(date)
+  if #zk_id > 0 then
+    first_line, _ = string.gsub(first_line, '# ', '')
+    api.nvim_buf_set_lines(
+      bufnr,
+      0,
+      1,
+      true,
+      { '# ' .. zk_id .. ' ' .. first_line }
+    )
+    vim.api.nvim_buf_set_name(bufnr, zk_id .. '.md')
+    vim.api.nvim_set_option_value('filetype', 'markdown', { buf = bufnr })
+  else
+    log.notify(
+      "There's already a note with the same ID.",
+      log_highlights.WARN,
+      {}
+    )
+  end
 end
 
 function M.tagfunc(pattern, flags, info)
-    local in_insert = string.match(flags, 'i') ~= nil
-    local pattern_provided = pattern ~= '\\<\\k\\k' or pattern == '*'
-    local all_tags = {}
-    if pattern_provided then
-        all_tags = get_all_tags(pattern)
-    else
-        all_tags = get_all_tags()
-    end
+  local in_insert = string.match(flags, 'i') ~= nil
+  local pattern_provided = pattern ~= '\\<\\k\\k' or pattern == '*'
+  local all_tags = {}
+  if pattern_provided then
+    all_tags = get_all_tags(pattern)
+  else
+    all_tags = get_all_tags()
+  end
 
-    local tags = {}
-    for _, tag in ipairs(all_tags) do
+  local tags = {}
+  for _, tag in ipairs(all_tags) do
+    table.insert(tags, {
+      name = string.gsub(tag.name, '#', ''),
+      filename = tag.file_name,
+      cmd = tostring(tag.linenr),
+      kind = 'zettelkasten',
+    })
+  end
+
+  if not in_insert then
+    local notes = browser.get_notes()
+    for _, note in ipairs(notes) do
+      if string.find(note.id, pattern, 1, true) or not pattern_provided then
         table.insert(tags, {
-            name = string.gsub(tag.name, '#', ''),
-            filename = tag.file_name,
-            cmd = tostring(tag.linenr),
-            kind = 'zettelkasten',
+          name = note.id,
+          filename = note.file_name,
+          cmd = '1',
+          kind = 'zettelkasten',
         })
+      end
     end
+  end
 
-    if not in_insert then
-        local notes = browser.get_notes()
-        for _, note in ipairs(notes) do
-            if string.find(note.id, pattern, 1, true) or not pattern_provided then
-                table.insert(tags, {
-                    name = note.id,
-                    filename = note.file_name,
-                    cmd = '1',
-                    kind = 'zettelkasten',
-                })
-            end
-        end
-    end
+  if #tags > 0 then
+    return tags
+  end
 
-    if #tags > 0 then
-        return tags
-    end
-
-    return nil
+  return nil
 end
 
 function M.keyword_expr(word, opts)
-    if not word then
-        return {}
-    end
+  if not word then
+    return {}
+  end
 
-    opts = opts or {}
-    opts.preview_note = opts.preview_note or false
-    opts.return_lines = opts.return_lines or false
+  opts = opts or {}
+  opts.preview_note = opts.preview_note or false
+  opts.return_lines = opts.return_lines or false
 
-    local note = browser.get_note(word)
-    if note == nil then
-        log.notify('Cannot find note.', log_highlights.WARN, {})
-        return {}
-    end
+  local note = browser.get_note(word)
+  if note == nil then
+    log.notify('Cannot find note.', log_highlights.WARN, {})
+    return {}
+  end
 
-    local lines = {}
-    if opts.preview_note and not opts.return_lines then
-        vim.cmd(config.preview_command .. ' ' .. note.file_name)
-    elseif opts.preview_note and opts.return_lines then
-        vim.list_extend(lines, read_note(note.file_name))
-    else
-        table.insert(lines, note.title)
-    end
+  local lines = {}
+  if opts.preview_note and not opts.return_lines then
+    vim.cmd(config.preview_command .. ' ' .. note.file_name)
+  elseif opts.preview_note and opts.return_lines then
+    vim.list_extend(lines, read_note(note.file_name))
+  else
+    table.insert(lines, note.title)
+  end
 
-    return lines
+  return lines
 end
 
 function M.get_back_references(note_id)
-    local note = browser.get_note(note_id)
-    if note == nil then
-        return {}
+  local note = browser.get_note(note_id)
+  if note == nil then
+    return {}
+  end
+
+  local title_cache = {}
+  local get_title = function(id)
+    if title_cache[id] ~= nil then
+      return title_cache[id]
     end
 
-    local title_cache = {}
-    local get_title = function(id)
-        if title_cache[id] ~= nil then
-            return title_cache[id]
-        end
+    title_cache[id] = browser.get_note(id).title
+    return title_cache[id]
+  end
 
-        title_cache[id] = browser.get_note(id).title
-        return title_cache[id]
-    end
+  local references = {}
+  for _, back_reference in ipairs(note.back_references) do
+    table.insert(references, {
+      id = back_reference.id,
+      linenr = back_reference.linenr,
+      title = back_reference.title,
+      file_name = back_reference.file_name,
+    })
+  end
 
-    local references = {}
-    for _, back_reference in ipairs(note.back_references) do
-        table.insert(references, {
-            id = back_reference.id,
-            linenr = back_reference.linenr,
-            title = back_reference.title,
-            file_name = back_reference.file_name,
-        })
-    end
-
-    return references
+  return references
 end
 
 function M.show_back_references(cword, use_loclist)
-    use_loclist = use_loclist or false
-    local references = M.get_back_references(cword)
-    if #references == 0 then
-        log.notify('No back references found.', log_highlights.WARN, {})
-        return
-    end
+  use_loclist = use_loclist or false
+  local references = M.get_back_references(cword)
+  if #references == 0 then
+    log.notify('No back references found.', log_highlights.WARN, {})
+    return
+  end
 
-    local lines = {}
-    for _, ref in ipairs(references) do
-        local line = {}
-        table.insert(line, fn.fnamemodify(ref.file_name, ':.'))
-        table.insert(line, ':')
-        table.insert(line, ref.linenr)
-        table.insert(line, ': ')
-        table.insert(line, ref.title)
+  local lines = {}
+  for _, ref in ipairs(references) do
+    local line = {}
+    table.insert(line, fn.fnamemodify(ref.file_name, ':.'))
+    table.insert(line, ':')
+    table.insert(line, ref.linenr)
+    table.insert(line, ': ')
+    table.insert(line, ref.title)
 
-        table.insert(lines, table.concat(line, ''))
-    end
+    table.insert(lines, table.concat(line, ''))
+  end
 
-    set_qflist(
-        {},
-        ' ',
-        vim.api.nvim_get_current_buf(),
-        use_loclist,
-        { title = '[[' .. cword .. ']] References', lines = lines }
-    )
+  set_qflist(
+    {},
+    ' ',
+    vim.api.nvim_get_current_buf(),
+    use_loclist,
+    { title = '[[' .. cword .. ']] References', lines = lines }
+  )
 
-    if use_loclist then
-        vim.cmd([[botright lopen | wincmd p]])
-    else
-        vim.cmd([[botright copen | wincmd p]])
-    end
+  if use_loclist then
+    vim.cmd([[botright lopen | wincmd p]])
+  else
+    vim.cmd([[botright copen | wincmd p]])
+  end
 end
 
 function M.get_toc(note_id, format)
-    format = format or '- [%h](%d)'
-    local references = M.get_back_references(note_id)
-    local lines = {}
-    for _, note in ipairs(references) do
-        table.insert(lines, {
-            file_name = note.file_name,
-            id = note.id,
-            title = note.title,
-        })
-    end
+  format = format or '- [%h](%d)'
+  local references = M.get_back_references(note_id)
+  local lines = {}
+  for _, note in ipairs(references) do
+    table.insert(lines, {
+      file_name = note.file_name,
+      id = note.id,
+      title = note.title,
+    })
+  end
 
-    return formatter.format(lines, format)
+  return formatter.format(lines, format)
 end
 
 function M.get_note_browser_content(opt)
-    if config.notes_path == '' then
-        log.notify("'notes_path' option is required for note browsing.", log_highlights.WARN, {})
-        return {}
-    end
-    local filter_tags = {}
-    for _, tag in ipairs(opt.tags) do
-        filter_tags[tag] = true
-    end
+  if config.notes_path == '' then
+    log.notify(
+      "'notes_path' option is required for note browsing.",
+      log_highlights.WARN,
+      {}
+    )
+    return {}
+  end
+  local filter_tags = {}
+  for _, tag in ipairs(opt.tags) do
+    filter_tags[tag] = true
+  end
 
-    local all_notes = browser.get_notes()
-    local lines = {}
-    for _, note in ipairs(all_notes) do
-        local has_tag
-        if #opt.tags == 0 then
-            has_tag = true
-        else
-            for _, tag in ipairs(note.tags) do
-                if filter_tags[tag.name] then
-                    has_tag = true
-                    break
-                end
-            end
+  local all_notes = browser.get_notes()
+  local lines = {}
+  for _, note in ipairs(all_notes) do
+    local has_tag
+    if #opt.tags == 0 then
+      has_tag = true
+    else
+      for _, tag in ipairs(note.tags) do
+        if filter_tags[tag.name] then
+          has_tag = true
+          break
         end
-        if has_tag then
-            table.insert(lines, {
-                file_name = note.file_name,
-                id = note.id,
-                references = note.references,
-                back_references = note.back_references,
-                tags = note.tags,
-                title = note.title,
-            })
-        end
+      end
     end
+    if has_tag then
+      table.insert(lines, {
+        file_name = note.file_name,
+        id = note.id,
+        references = note.references,
+        back_references = note.back_references,
+        tags = note.tags,
+        title = note.title,
+      })
+    end
+  end
 
-    return formatter.format(lines, config.browseformat)
+  if opt.date then
+    lines = vim.tbl_filter(function(v)
+      local note_date = vim.tbl_map(function(v) return tonumber(v) end, vim.split(v.id, '-'))
+      if opt.date.year and note_date[1] ~= opt.date.year then
+        return false
+      end
+      if opt.date.month and note_date[2] ~= opt.date.month then
+        return false
+      end
+      if opt.date.day and note_date[3] ~= opt.date.day then
+        return false
+      end
+      return true
+    end, lines)
+  end
+
+  return formatter.format(lines, config.browseformat)
 end
 
 function M.add_hover_command()
-    if fn.exists(':ZkHover') == 2 then
-        return
-    end
+  if fn.exists(':ZkHover') == 2 then
+    return
+  end
 
-    vim.api.nvim_buf_create_user_command(0, 'ZkHover', function(opt)
-        return M._internal_execute_hover_cmd(opt.fargs)
-    end, {
-        nargs = '*',
-        complete = function(ArgLead)
-            if vim.startswith(ArgLead, '-') then
-                return vim.tbl_filter(function(t)
-                    return vim.startswith(t, ArgLead)
-                end, { '-preview', '-return-lines' })
-            end
-        end,
-    })
+  vim.api.nvim_buf_create_user_command(0, 'ZkHover', function(opt)
+    return M._internal_execute_hover_cmd(opt.fargs)
+  end, {
+    nargs = '*',
+    complete = function(ArgLead)
+      if vim.startswith(ArgLead, '-') then
+        return vim.tbl_filter(function(t)
+          return vim.startswith(t, ArgLead)
+        end, { '-preview', '-return-lines' })
+      end
+    end,
+  })
 end
 
 function M._internal_execute_hover_cmd(args)
-    local cword = ''
-    for _, v in ipairs(args) do
-        if v ~= '-preview' and v ~= '-return-lines' then
-            cword = v
-        end
+  local cword = ''
+  for _, v in ipairs(args) do
+    if v ~= '-preview' and v ~= '-return-lines' then
+      cword = v
     end
+  end
 
-    if cword == '' then
-        cword = fn.expand('<cword>')
-    end
+  if cword == '' then
+    cword = fn.expand('<cword>')
+  end
 
-    local lines = M.keyword_expr(cword, {
-        preview_note = vim.tbl_contains(args, '-preview'),
-        return_lines = vim.tbl_contains(args, '-return-lines'),
-    })
-    if #lines > 0 then
-        log.notify(table.concat(lines, '\n'), log_highlights.INFO, {})
-    end
+  local lines = M.keyword_expr(cword, {
+    preview_note = vim.tbl_contains(args, '-preview'),
+    return_lines = vim.tbl_contains(args, '-return-lines'),
+  })
+  if #lines > 0 then
+    log.notify(table.concat(lines, '\n'), log_highlights.INFO, {})
+  end
 end
 
 function M.zknew(opt) -- {{{
-    opt = opt or {}
-    local buf = vim.api.nvim_create_buf(true, false)
-    vim.api.nvim_open_win(buf, true, { split = 'above' })
-
-    if config.notes_path ~= '' then
-        if vim.fn.isdirectory(config.notes_path) == 0 then
-            vim.fn.mkdir(vim.fn.expand(config.notes_path), 'p', '0700')
-        end
-        vim.cmd('lcd ' .. config.notes_path)
+  opt = opt or {}
+  local buf = vim.api.nvim_create_buf(true, false)
+  local winids = vim.api.nvim_tabpage_list_wins(0)
+  for _, w in ipairs(winids) do
+    if #vim.api.nvim_win_get_config(w).relative == 0 then
+      vim.api.nvim_open_win(buf, true, { split = 'above', win = w })
+      break
     end
+  end
 
-    if opt.template then
-        local templete_context = vim.fn.readfile(opt.template, '')
-        vim.api.nvim_buf_set_lines(0, 0, -1, false, templete_context)
-    else
-        vim.cmd('normal ggI# New Note')
+  if config.notes_path ~= '' then
+    if vim.fn.isdirectory(config.notes_path) == 0 then
+      vim.fn.mkdir(vim.fn.expand(config.notes_path), 'p', '0700')
     end
+    vim.cmd('lcd ' .. config.notes_path)
+  end
 
-    M.set_note_id(buf)
-    vim.cmd('normal $')
+  if opt.template then
+    local templete_context = vim.fn.readfile(opt.template, '')
+    vim.api.nvim_buf_set_lines(0, 0, -1, false, templete_context)
+  else
+    vim.cmd('normal ggI# New Note')
+  end
+
+  local date = {}
+
+  if opt.date then
+    date.year = opt.date.year
+    date.month = opt.date.month
+    date.day = opt.date.day
+  end
+
+  M.set_note_id(buf, date)
+  vim.cmd('normal $')
 end
 -- }}}
 
 function M.setup(opts)
-    opts = opts or {}
-    opts.notes_path = opts.notes_path or ''
+  opts = opts or {}
+  opts.notes_path = opts.notes_path or ''
 
-    config._set(opts)
+  config._set(opts)
 end
 
 return M

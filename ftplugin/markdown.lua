@@ -1,7 +1,7 @@
 local re = [[\d\d\d\d-\d\d-\d\d-\d\d-\d\d-\d\d\.md]]
 
 if not vim.regex(re):match_str(vim.api.nvim_buf_get_name(0)) then
-    return
+  return
 end
 
 vim.opt_local.tagfunc = 'v:lua.zettelkasten.tagfunc'
@@ -20,13 +20,13 @@ vim.opt_local.define = '^# \\s*'
 vim.opt_local.keywordprg = ':ZkHover'
 
 if vim.fn.mapcheck('[I', 'n') == '' then
-    vim.api.nvim_buf_set_keymap(
-        0,
-        'n',
-        '[I',
-        '<CMD>lua require("zettelkasten").show_back_references(vim.fn.expand("<cword>"))<CR>',
-        { noremap = true, silent = true, nowait = true }
-    )
+  vim.api.nvim_buf_set_keymap(
+    0,
+    'n',
+    '[I',
+    '<CMD>lua require("zettelkasten").show_back_references(vim.fn.expand("<cword>"))<CR>',
+    { noremap = true, silent = true, nowait = true }
+  )
 end
 
 require('zettelkasten').add_hover_command()

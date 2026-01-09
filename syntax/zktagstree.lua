@@ -1,5 +1,5 @@
 if vim.b.current_syntax == 'zktagstree' then
-    return
+  return
 end
 vim.cmd([[
 " syntax match ZettelKastenID '[0-9]\+-[0-9]\+-[0-9]\+-[0-9]\+-[0-9]\+-[0-9]\+\.md'

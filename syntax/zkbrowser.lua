@@ -1,5 +1,5 @@
 if vim.b.current_syntax == 'zkbrowser' then
-    return
+  return
 end
 vim.cmd([[
 
