@@ -33,7 +33,9 @@ function M.get()
 end
 
 function M.default_action(entry)
-  vim.cmd('ZkBrowse --tags ' .. entry.str)
+  require('zettelkasten.browser').browse({
+    tags = { entry.str },
+  })
 end
 
 M.preview_win = true
