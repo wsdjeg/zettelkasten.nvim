@@ -40,7 +40,9 @@ local function show_script_names(opts)
         actions.select_default:replace(function()
           local entry = action_state.get_selected_entry()
           actions.close(prompt_bufnr)
-          vim.cmd('ZkBrowse --tags ' .. entry.value)
+          require('zettelkasten.browser').browse({
+            tags = { entry.value },
+          })
           vim.cmd('stopinsert')
         end)
         return true
