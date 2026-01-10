@@ -11,7 +11,7 @@ is to make it easier to use the Zettelkasten note taking system:
 https://zettelkasten.de/introduction/
 
 It is meant to provide the following features in a way that is consistent with
-Vim's own features:
+Neovim's own features:
 
 1. Note ID completion
 2. ID generation
@@ -81,7 +81,7 @@ Buffer Local ~
 
                                                                 *zettelkasten-[I*
 [I      Lists the notes that reference the note ID under the cursor. Available
-        in markdown buffers and plugin specific buffers.
+        in zettelkasten note buffers and plugin specific buffers.
 
 COMMANDS                                                  *zettelkasten-commands*
 ================================================================================
@@ -209,6 +209,34 @@ get_back_references({note_id})                 *zettelkasten-get_back_references
         - {title} (string): The title of the note with {id}
         - {file_name} (string): The file name of the note with {id}
 
+zknew({opts})                                                *zettelkasten-zknew*
+
+    Create a new Zettelkasten note with optional parameters.
+
+    Parameters: ~
+        {opts}  (table, optional)
+                Configuration options for creating the note.
+                Defaults to an empty table `{}`.
+
+        Fields: ~
+            date    (table)
+                    Specify the date for the note.
+
+                    Fields: ~
+                        year    (number)  Four-digit year
+                        month   (number)  Month number (1–12)
+                        day     (number)  Day of the month (1–31)
+
+    Example: ~
+        Create a Zettelkasten note for a specific date: >
+            require('zettelkasten').zknew({
+                date = {
+                    year = 2023,
+                    month = 6,
+                    day = 12,
+                },
+            })
+        
 get_toc({note_id}, {format})                               *zettelkasten-get_toc*
 
     Returns a table that contains a list of notes that refer to {note_id}
