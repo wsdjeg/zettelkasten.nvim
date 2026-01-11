@@ -40,6 +40,9 @@ local function extract_id_and_title(line)
   return { id = note_id, title = string.gsub(title, '\r', '') }
 end
 
+---@param line string
+---@param linenr integer
+---@return table<ZettelkastenRefs>
 local function extract_references(line, linenr)
   assert(line ~= nil)
 
