@@ -10,6 +10,7 @@ A [Zettelkasten](https://zettelkasten.de) note taking plugin for Neovim
 
 <!-- vim-markdown-toc GFM -->
 
+- [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Picker sources](#picker-sources)
@@ -21,6 +22,15 @@ A [Zettelkasten](https://zettelkasten.de) note taking plugin for Neovim
 - [Feedback](#feedback)
 
 <!-- vim-markdown-toc -->
+
+## Features
+
+- Zettelkasten-style note taking in Neovim
+- Create and browse notes efficiently
+- Tag-based filtering and navigation
+- Reference and backlink support
+- Daily notes and calendar integration
+- Optional picker integration
 
 ## Installation
 
