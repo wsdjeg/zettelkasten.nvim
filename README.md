@@ -13,6 +13,7 @@ A [Zettelkasten](https://zettelkasten.de) note taking plugin for Neovim
 - [Installation](#installation)
 - [Usage](#usage)
 - [Picker sources](#picker-sources)
+- [Calendar extension](#calendar-extension)
 - [Debug](#debug)
 - [Screenshots](#screenshots)
 - [Self-Promotion](#self-promotion)
@@ -82,6 +83,16 @@ which can be opened by following command:
 | ---------------- | ----------------------------- |
 | zettelkasten     | fuzzy find zettelkasten notes |
 | zettelkasten_tag | fuzzy find zettelkasten tags  |
+
+## Calendar extension
+
+zettelkasten.nvim also provides an extension for [calendar.nvim](https://github.com/wsdjeg/calendar.nvim).
+It highlights dates that have Zettelkasten notes associated with them.
+
+When pressing `<Enter>` on a date in the calendar, the following actions are available:
+
+1. Create a daily note
+2. Browse daily notes
 
 ## Debug
 
