@@ -77,9 +77,9 @@ local function generate_note_id(date)
   note_time.year = date.year or t.year
   note_time.month = date.month or t.month
   note_time.day = date.day or t.day
-  note_time.hour = date.hour
-  note_time.min = date.min
-  note_time.sec = date.sec
+  note_time.hour = date.hour or t.hour
+  note_time.min = date.min or t.min
+  note_time.sec = date.sec or t.sec
   return os.date(NOTE_ID_STRFTIME_FORMAT, os.time(note_time))
 end
 

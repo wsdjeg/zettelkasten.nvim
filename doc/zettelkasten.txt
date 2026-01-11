@@ -226,6 +226,9 @@ zknew({opts})                                                *zettelkasten-zknew
                         year    (number)  Four-digit year
                         month   (number)  Month number (1–12)
                         day     (number)  Day of the month (1–31)
+                        hour    (number)  Hour of the day (0–23)
+                        min     (number)  Minute (0–59)
+                        sec     (number)  Second (0–59)
 
     Example: ~
         Create a Zettelkasten note for a specific date: >
