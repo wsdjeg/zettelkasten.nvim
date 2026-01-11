@@ -94,6 +94,13 @@ which can be opened by following command:
 | zettelkasten     | fuzzy find zettelkasten notes |
 | zettelkasten_tag | fuzzy find zettelkasten tags  |
 
+key bindings in zettelkasten source:
+
+| key binding | description                                  |
+| ----------- | -------------------------------------------- |
+| `<Enter>`   | open selected note                           |
+| `<C-y>`     | insert selected note's id to cursor position |
+
 ## Calendar extension
 
 zettelkasten.nvim also provides an extension for [calendar.nvim](https://github.com/wsdjeg/calendar.nvim).

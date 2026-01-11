@@ -59,6 +59,14 @@ function M.default_action(entry)
   vim.cmd('edit ' .. entry.value.file_name)
 end
 
+function M.actions()
+  return {
+    ['<C-y>'] = function(entry)
+      vim.api.nvim_paste(entry.value.id, false, -1)
+    end,
+  }
+end
+
 M.preview_win = true
 
 ---@field item PickerItem
