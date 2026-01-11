@@ -85,6 +85,9 @@ local function extract_back_references(notes, note_id)
   return back_references
 end
 
+---@param line string
+---@param linenr integer
+---@return table<string>
 local function extract_tags(line, linenr)
   assert(line ~= nil)
 
@@ -100,6 +103,8 @@ local function extract_tags(line, linenr)
   return tags
 end
 
+---@param file_path string
+---@return ZettelkastenNote
 local function get_note_information(file_path)
   local last_modified =
     fn.strftime('%Y-%m-%d.%H:%M:%S', fn.getftime(file_path))
@@ -166,6 +171,8 @@ local function get_note_information(file_path)
   return info
 end
 
+---@param id string
+---@return ZettelkastenNote | nil
 function M.get_note(id)
   if s_note_cache_with_id[id] ~= nil then
     return s_note_cache_with_id[id]
@@ -180,6 +187,7 @@ function M.get_note(id)
   return nil
 end
 
+--- @return table<ZettelkastenNote>
 function M.get_notes()
   local folder = config.notes_path
   local files = get_files(folder)
@@ -207,6 +215,7 @@ function M.get_notes()
   return all_notes
 end
 
+--- @return table<string>
 function M.get_tags()
   local notes = M.get_notes()
   local tags = {}
@@ -248,4 +257,5 @@ function M.browse(opt)
   vim.opt_local.buflisted = false
   vim.opt_local.modifiable = false
 end
+
 return M
