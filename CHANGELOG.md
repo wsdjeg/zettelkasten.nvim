@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.2.0](https://github.com/wsdjeg/zettelkasten.nvim/compare/v2.1.0...v2.2.0) (2026-01-18)
+
+
+### Features
+
+* add calendar.nvim extension ([a21a1df](https://github.com/wsdjeg/zettelkasten.nvim/commit/a21a1df959da683db104afcf6460bda36cc7cea8))
+* support tags completion ([fd08802](https://github.com/wsdjeg/zettelkasten.nvim/commit/fd08802d9106fd03942e4b2edd87d6f9f87ac20c))
+* use ctrl-y to insert note id from picker ([72672fd](https://github.com/wsdjeg/zettelkasten.nvim/commit/72672fd5c49e9b1d6c204fa4613dd8c11f029291))
+
+
+### Bug Fixes
+
+* fix zettelkasten note time ([9292816](https://github.com/wsdjeg/zettelkasten.nvim/commit/92928168480c4f1b9684b0ea1cc94978b76156d2))
+* use browse api instead of command ([315b119](https://github.com/wsdjeg/zettelkasten.nvim/commit/315b119cd50e0a0cf6c8e9d0d7e35122c8c9887a))
+* use lua function in telescope extension ([1dfb089](https://github.com/wsdjeg/zettelkasten.nvim/commit/1dfb089e8506410e98532ba0de644f91200de98a))
+
 ## [2.1.0](https://github.com/wsdjeg/zettelkasten.nvim/compare/v2.0.0...v2.1.0) (2025-11-23)
 
 
