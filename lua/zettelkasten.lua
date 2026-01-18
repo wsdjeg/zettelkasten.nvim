@@ -83,31 +83,61 @@ local function generate_note_id(date)
   return os.date(NOTE_ID_STRFTIME_FORMAT, os.time(note_time))
 end
 
+local complete_tags = false
+
 function M.completefunc(find_start, base)
   if find_start == 1 and base == '' then
     local pos = api.nvim_win_get_cursor(0)
     local line = api.nvim_get_current_line()
     local line_to_cursor = line:sub(1, pos[2])
-    return fn.match(line_to_cursor, '\\k*$')
+    if vim.regex('\\s#\\k*$'):match_str(line_to_cursor) then
+      complete_tags = true
+      return fn.match(line_to_cursor, '#\\k*$')
+    elseif vim.regex('^#\\k*$'):match_str(line_to_cursor) then
+      complete_tags = true
+      return fn.match(line_to_cursor, '#\\k*$')
+    else
+      complete_tags = false
+      return fn.match(line_to_cursor, '\\k*$')
+    end
   end
-
-  local notes = vim.tbl_filter(function(note)
-    -- here the note sometimes do not have title, then it is nil
-    return string.match(note.title, base)
-  end, browser.get_notes())
 
   local words = {}
-  for _, ref in ipairs(notes) do
-    table.insert(words, {
-      word = ref.id,
-      abbr = ref.title,
-      dup = 0,
-      empty = 0,
-      kind = config.completion_kind,
-      icase = 1,
-    })
-  end
+  if complete_tags then
+    local tags = browser.get_tags()
+    local temp = {}
+    for _, v in ipairs(tags) do
+      temp[v.name] = true
+    end
+    for v, _ in pairs(temp) do
+      if string.match(v, base) then
+        table.insert(words, {
+          word = v,
+          abbr = v,
+          dup = 0,
+          empty = 0,
+          kind = config.completion_kind,
+          icase = 1,
+        })
+      end
+    end
+  else
+    local notes = vim.tbl_filter(function(note)
+      -- here the note sometimes do not have title, then it is nil
+      return string.match(note.title, base)
+    end, browser.get_notes())
 
+    for _, ref in ipairs(notes) do
+      table.insert(words, {
+        word = ref.id,
+        abbr = ref.title,
+        dup = 0,
+        empty = 0,
+        kind = config.completion_kind,
+        icase = 1,
+      })
+    end
+  end
   return words
 end
 
@@ -323,7 +353,9 @@ function M.get_note_browser_content(opt)
 
   if opt.date then
     lines = vim.tbl_filter(function(v)
-      local note_date = vim.tbl_map(function(v) return tonumber(v) end, vim.split(v.id, '-'))
+      local note_date = vim.tbl_map(function(v)
+        return tonumber(v)
+      end, vim.split(v.id, '-'))
       if opt.date.year and note_date[1] ~= opt.date.year then
         return false
       end

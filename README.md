@@ -79,6 +79,7 @@ luarocks install zettelkasten.nvim
 | `Ctrl-l`        | clear tags filter pattarn          |
 | `Ctrl-] / K`    | preview note in vim preview-window |
 | `[I`            | list references in quickfix-window |
+| `Ctrl-x Ctrl-u` | complete note id or tags           |
 
 ## Picker sources
 

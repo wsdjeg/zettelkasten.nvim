@@ -188,8 +188,10 @@ completefunc({base})                                  *zettelkasten-completefunc
     Implements a |complete-function|. Given a {base} note ID or title, returns
     a list of notes matching notes.
 
+    This function also supports note tags completion after `#`.
+
     Parameters: ~
-        {base} (string): Note ID or title.
+        {base} (string): Note ID, title or tags.
 
 show_back_references({cword}, {use_loclist})  *zettelkasten-show_back_references*
 
