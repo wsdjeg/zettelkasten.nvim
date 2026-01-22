@@ -316,16 +316,11 @@ function M.paste_image()
   local id = generate_note_id()
   local filename = config.notes_path .. '/' .. id .. '.png'
   if require('zettelkasten.util').save_clipboard_image(filename) then
-    local cursor = vim.api.nvim_win_get_cursor(0)
-
-    vim.api.nvim_buf_set_text(
-      0,
-      cursor[1] - 1,
-      cursor[2] + 1,
-      cursor[1] - 1,
-      cursor[2] + 1,
-      { '![' .. id .. '](' .. id .. '.png)' }
-    )
+    local text = '![' .. id .. '](' .. id .. '.png)'
+    local reg = vim.fn.getreg('"')
+    vim.fn.setreg('"', text)
+    vim.api.nvim_input('p')
+    vim.fn.setreg('"', reg)
   end
 end
 
