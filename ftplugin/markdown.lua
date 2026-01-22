@@ -29,4 +29,12 @@ if vim.fn.mapcheck('[I', 'n') == '' then
   )
 end
 
+vim.api.nvim_buf_set_keymap(0, 'n', '<leader>p', '', {
+  silent = true,
+  noremap = true,
+  callback = function()
+    require('zettelkasten').paste_image()
+  end,
+})
+
 require('zettelkasten').add_hover_command()

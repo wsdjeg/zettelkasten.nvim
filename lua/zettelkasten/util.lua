@@ -1,4 +1,7 @@
 local M = {}
+
+local log = require('zettelkasten.log')
+
 M.group2dict = function(name)
   local id = vim.fn.hlID(name)
   if id == 0 then
@@ -123,4 +126,88 @@ function M.syntax_at(...)
   end
   return name, hl
 end
+
+-- this function is inspired by neoment
+-- https://github.com/Massolari/neoment
+
+M.save_clipboard_image = function(filename)
+  local temp_file = filename
+
+  -- Try to get image from clipboard using platform-specific commands
+  local success = false
+  local error_msg = ''
+
+  if vim.fn.has('mac') == 1 then
+    local result = vim.fn.system(
+      [[osascript -e "get the clipboard as «class PNGf»" | sed "s/«data PNGf//; s/»//" | xxd -r -p > ]]
+        .. temp_file
+    )
+    success = vim.v.shell_error == 0
+
+    if not success then
+      error_msg = 'No image found in clipboard or osascript error: ' .. result
+    end
+  elseif vim.fn.has('linux') == 1 then
+    -- Linux: Try using xclip
+    local has_xclip = vim.fn.executable('xclip') == 1
+
+    if has_xclip then
+      -- Check if clipboard has a PNG image
+      local result = vim.fn.system('xclip -selection clipboard -t TARGETS -o')
+      if result:find('image/png') then
+        vim.fn.system(
+          'xclip -selection clipboard -t image/png -o > '
+            .. vim.fn.shellescape(temp_file)
+        )
+        success = vim.v.shell_error == 0 and vim.fn.getfsize(temp_file) > 0
+      else
+        error_msg = 'No image found in clipboard'
+      end
+    else
+      error_msg =
+        "The 'xclip' command is not available. Install with your package manager."
+    end
+  elseif vim.fn.has('win32') == 1 or vim.fn.has('win64') == 1 then
+    -- Windows: Try using PowerShell
+    local ps_script = [[
+		Add-Type -AssemblyName System.Windows.Forms;
+		if ([System.Windows.Forms.Clipboard]::ContainsImage()) {
+			$img = [System.Windows.Forms.Clipboard]::GetImage();
+			$img.Save(']] .. temp_file:gsub('\\', '\\\\') .. [[', [System.Drawing.Imaging.ImageFormat]::Png);
+			Write-Output "success"
+		} else {
+			Write-Error "No image in clipboard"
+			exit 1
+		}
+		]]
+
+    local result =
+      vim.fn.system({ 'powershell', '-NoProfile', '-Command', ps_script })
+    success = vim.v.shell_error == 0 and result:find('success') ~= nil
+
+    if not success then
+      error_msg = 'No image found in clipboard or PowerShell error'
+    end
+  else
+    error_msg = 'Clipboard image upload not supported on this platform'
+  end
+
+  if not success then
+    log.notify(error_msg, 'WarningMsg')
+    return
+  end
+
+  -- Check if file was created and has content
+  if
+    vim.fn.filereadable(temp_file) == 0 or vim.fn.getfsize(temp_file) <= 0
+  then
+    log.notify(
+      'Failed to save clipboard image to temporary file',
+      'WarningMsg'
+    )
+    return
+  end
+  return true
+end
+
 return M

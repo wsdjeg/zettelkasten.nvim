@@ -72,6 +72,7 @@ local function get_all_tags(lookup_tag)
 end
 
 local function generate_note_id(date)
+  date = date or {}
   local t = os.date('*t')
   local note_time = {}
   note_time.year = date.year or t.year
@@ -309,6 +310,23 @@ function M.get_toc(note_id, format)
   end
 
   return formatter.format(lines, format)
+end
+
+function M.paste_image()
+  local id = generate_note_id()
+  local filename = config.notes_path .. '/' .. id .. '.png'
+  if require('zettelkasten.util').save_clipboard_image(filename) then
+    local cursor = vim.api.nvim_win_get_cursor(0)
+
+    vim.api.nvim_buf_set_text(
+      0,
+      cursor[1] - 1,
+      cursor[2] + 1,
+      cursor[1] - 1,
+      cursor[2] + 1,
+      { '![' .. id .. '](' .. id .. '.png)' }
+    )
+  end
 end
 
 function M.get_note_browser_content(opt)
