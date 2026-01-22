@@ -319,7 +319,7 @@ function M.paste_image()
     local text = '![' .. id .. '](' .. id .. '.png)'
     local reg = vim.fn.getreg('"')
     vim.fn.setreg('"', text)
-    vim.api.nvim_input('p')
+    vim.cmd('normal! p')
     vim.fn.setreg('"', reg)
   end
 end
