@@ -8,6 +8,8 @@
 
 local M = {}
 
+local config = require('zettelkasten.config')
+
 local function str2chars(str)
   local t = {}
   for _, k in ipairs(vim.fn.split(str, '\\zs')) do
@@ -27,20 +29,30 @@ local s_formatters = {
     return vim.fn.fnamemodify(line.file_name, ':t')
   end,
   ['%h'] = function(line)
-    if vim.fn.strdisplaywidth(line.title) < 30 then
+    if vim.fn.strdisplaywidth(line.title) < config.browse_title_width then
       return line.title
-        .. string.rep(' ', 30 - vim.fn.strdisplaywidth(line.title))
+        .. string.rep(
+          ' ',
+          config.browse_title_width - vim.fn.strdisplaywidth(line.title)
+        )
     else
       local t = ''
       for _, char in ipairs(str2chars(line.title)) do
-        if vim.fn.strdisplaywidth(t) + vim.fn.strdisplaywidth(char) <= 27 then
+        if
+          vim.fn.strdisplaywidth(t) + vim.fn.strdisplaywidth(char)
+          <= config.browse_title_width - 3
+        then
           t = t .. char
         else
           break
         end
       end
       t = t .. '...'
-      return t .. string.rep(' ', 30 - vim.fn.strdisplaywidth(t))
+      return t
+        .. string.rep(
+          ' ',
+          config.browse_title_width - vim.fn.strdisplaywidth(t)
+        )
     end
   end,
   ['%d'] = function(line)
