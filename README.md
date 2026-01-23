@@ -81,6 +81,12 @@ luarocks install zettelkasten.nvim
 | `[I`            | list references in quickfix-window |
 | `Ctrl-x Ctrl-u` | complete note id or tags           |
 
+**Key bindings in zettelkasten notes buffer:**
+
+| key bindings | description                |
+| ------------ | -------------------------- |
+| `<Leader>p`  | paste image from clipboard |
+
 ## Picker sources
 
 zettelkasten.nvim also provides zettelkasten sources for [picker.nvim](https://github.com/wsdjeg/picker.nvim),
