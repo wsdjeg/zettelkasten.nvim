@@ -14,6 +14,7 @@ M.template_dir = '~/.zettelkasten_template'
 M.browseformat = '%f - %h [%r Refs] [%b B-Refs] %t'
 M.preview_command = 'pedit'
 M.completion_kind = '[zettelkasten]'
+M.browse_title_width = 30
 
 M._set = function(opts)
   opts = opts or {}
@@ -22,6 +23,7 @@ M._set = function(opts)
   M.browseformat = opts.browseformat or M.browseformat
   M.completion_kind = opts.completion_kind or M.completion_kind
   M.templates_path = opts.templates_path or M.templates_path
+  M.browse_title_width = opts.browse_title_width or M.browse_title_width
 end
 
 return M
