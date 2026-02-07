@@ -148,7 +148,33 @@ Love this plugin? Follow [me](https://wsdjeg.net/) on
 
 ## Credits
 
-- [Furkanzmc/zettelkasten.nvim](https://github.com/Furkanzmc/zettelkasten.nvim)
+This plugin is forked from [Furkanzmc/zettelkasten.nvim](https://github.com/Furkanzmc/zettelkasten.nvim), which is still in active development.
+here is Summary of Differences:
+
+1. New Features Added:
+
+   - Clipboard image pasting
+   - Tags completion support
+   - Tags Sidebar window
+   - Option to set note browser title width
+   - Calendar.nvim extension
+   - Picker custom note templates
+   - luarocks support
+   - Use of Lua syntax file
+   - Improved notifications and ZkHover command
+   - Zettelkasten tags preview and new picker source
+
+2. Improvements:
+
+   - Many bug fixes (e.g., for note time, highlight range, default actions)
+   - Use of Lua API and vim.cmd for consistency
+   - More readable setup and configuration (moved from vim.g to setup function)
+   - Enhanced docs and README updates
+
+3. Other Changes:
+
+   - Release automation and tagging with release-please
+   - Small tweaks for better Neovim integration (e.g., file type detection, keybindings, etc.)
 
 ## Feedback
 
