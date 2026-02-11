@@ -57,6 +57,7 @@ function M.zettelkasten_create(action)
       tags_str = tags_str .. ' #' .. tag
     end
     table.insert(content_lines, 3, tags_str)
+    table.insert(content_lines, 4, '')
   end
 
   -- 写入文件
