@@ -13,8 +13,9 @@ A [Zettelkasten](https://zettelkasten.de) note taking plugin for Neovim
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Picker sources](#picker-sources)
+- [Picker Integration](#picker-integration)
 - [Calendar extension](#calendar-extension)
+- [Chat Integration](#chat-integration)
 - [Debug](#debug)
 - [Screenshots](#screenshots)
 - [Self-Promotion](#self-promotion)
@@ -87,7 +88,7 @@ luarocks install zettelkasten.nvim
 | ------------ | -------------------------- |
 | `<Leader>p`  | paste image from clipboard |
 
-## Picker sources
+## Picker Integration
 
 zettelkasten.nvim also provides zettelkasten sources for [picker.nvim](https://github.com/wsdjeg/picker.nvim),
 which can be opened by following command:
@@ -117,6 +118,11 @@ When pressing `<Enter>` on a date in the calendar, the following actions are ava
 
 1. Create a daily note
 2. Browse daily notes
+
+## Chat Integration
+
+zettelkasten.nvim also provides a `zettelkasten_create` tool for [chat.nvim](https://github.com/wsdjeg/chat.nvim),
+which is used to create zettelkasten note based on current session.
 
 ## Debug
 
