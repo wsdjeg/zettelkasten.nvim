@@ -71,7 +71,7 @@ local function get_all_tags(lookup_tag)
   return tags
 end
 
-local function generate_note_id(date)
+function M.generate_note_id(date)
   date = date or {}
   local t = os.date('*t')
   local note_time = {}
@@ -144,7 +144,7 @@ end
 
 function M.set_note_id(bufnr, date)
   local first_line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, true)[1]
-  local zk_id = generate_note_id(date)
+  local zk_id = M.generate_note_id(date)
   if #zk_id > 0 then
     first_line, _ = string.gsub(first_line, '# ', '')
     api.nvim_buf_set_lines(
@@ -313,7 +313,7 @@ function M.get_toc(note_id, format)
 end
 
 function M.paste_image()
-  local id = generate_note_id()
+  local id = M.generate_note_id()
   local filename = config.notes_path .. '/' .. id .. '.png'
   if require('zettelkasten.util').save_clipboard_image(filename) then
     local text = '![' .. id .. '](' .. id .. '.png)'
