@@ -94,7 +94,7 @@ function M.scheme()
       name = 'zettelkasten_create',
       description = [[
       use @zk create <title> to create new zettelkasten note.
-      Supports adding tags to the note.
+      Supports adding tags to the note. This function creates a new note only when the user gives an explicit instruction (@zk create).
       ]],
       parameters = {
         type = 'object',
