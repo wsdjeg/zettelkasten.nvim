@@ -96,6 +96,11 @@ function M.scheme()
       description = [[
       use @zk create <title> to create new zettelkasten note.
       Supports adding tags to the note. This function creates a new note only when the user gives an explicit instruction (@zk create).
+
+      请严格遵循以下规则：
+      
+      1. 必须 user 明确发送消息包含新建笔记，在执行本工具。
+      2. 笔记 tags 少于等于 3 个，避免同义词
       ]],
       parameters = {
         type = 'object',
