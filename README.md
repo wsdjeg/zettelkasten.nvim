@@ -122,7 +122,67 @@ When pressing `<Enter>` on a date in the calendar, the following actions are ava
 ## Chat Integration
 
 zettelkasten.nvim also provides a `zettelkasten_create` tool for [chat.nvim](https://github.com/wsdjeg/chat.nvim),
-which is used to create zettelkasten note based on current session.
+which is used to create new zettelkasten notes with automatic ID generation and tag support. This tool is particularly useful for knowledge management and note-taking workflows within Neovim. It integrates with the `zettelkasten.nvim` plugin to create properly formatted notes in your zettelkasten system.
+
+**Usage:**
+
+```
+@zk create <title>
+```
+
+**Parameters:**
+
+- `title` (string, required): The title of the zettelkasten note
+- `content` (string, required): The main body content of the note
+- `tags` (array of strings, optional): Optional tags for categorizing the note (e.g., `["programming", "vim"]`). Tags should be in English.
+
+**Examples:**
+
+1. **Basic note creation**:
+
+   ```
+   Create a note about Vim tips: @zk create "Vim Productivity Tips" content="Here are some useful Vim tips..."
+   ```
+
+2. **Note with tags**:
+
+   ```
+   Document this Lua pattern: @zk create "Lua Metatable Patterns" content="Metatables allow..." tags=["lua", "patterns"]
+   ```
+
+3. **Natural language integration**:
+   ```
+   I want to save this idea about AI: @zk create "AI Assistant Design" content="The architecture should include..." tags=["ai", "design"]
+   ```
+
+**How it works:**
+
+1. Generates a unique ID for the note using `zettelkasten`'s ID generation system
+2. Creates a markdown file at `notes_path/<id>.md` (where `notes_path` is configured in your zettelkasten setup)
+3. Formats the content with:
+   - First line: `# <id> <title>`
+   - Empty line
+   - Tags line (if provided): `tags: #tag1 #tag2`
+   - Another empty line (if tags are present)
+   - The note content
+4. Returns success information including the note ID, title, and file path
+
+**Notes:**
+
+- This tool requires the `zettelkasten.nvim` plugin to be installed and configured
+- The `notes_path` should be properly set in your zettelkasten configuration
+- Tags are automatically prefixed with `#` when written to the file
+- The tool validates all input types and returns descriptive error messages if validation fails
+- Only creates notes when explicitly invoked with `@zk create` instruction
+
+**Error handling:**
+
+The tool provides clear error messages for common issues:
+
+- Missing required parameters (title or content)
+- Invalid parameter types (e.g., non-string title)
+- File creation failures
+- Invalid tag formats
 
 ## Debug
 
