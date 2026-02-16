@@ -81,6 +81,10 @@ function M.is_last_win()
   return num == 1
 end
 
+function M.is_float(win)
+  return #vim.api.nvim_win_get_config(win).relative > 0
+end
+
 local function get_color(name)
   local c = vim.api.nvim_get_hl(0, { name = name })
 
