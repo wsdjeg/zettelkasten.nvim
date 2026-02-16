@@ -1,5 +1,30 @@
 # Changelog
 
+## [2.2.0](https://github.com/wsdjeg/zettelkasten.nvim/compare/v2.1.0...v2.2.0) (2026-02-16)
+
+
+### Features
+
+* add browse_title_width option ([db176de](https://github.com/wsdjeg/zettelkasten.nvim/commit/db176de944dbfd64446aa55216ff31a871c8ce2b))
+* add calendar.nvim extension ([a21a1df](https://github.com/wsdjeg/zettelkasten.nvim/commit/a21a1df959da683db104afcf6460bda36cc7cea8))
+* add chat.nvim tool ([f3fdfd6](https://github.com/wsdjeg/zettelkasten.nvim/commit/f3fdfd6b914fce1401ff091d8682ef86d934829f))
+* add zettelkasten_get tool ([9aa9038](https://github.com/wsdjeg/zettelkasten.nvim/commit/9aa90388c8ae1270759946b021a0bf2a344bc872))
+* paste image from clipboard ([b294140](https://github.com/wsdjeg/zettelkasten.nvim/commit/b294140579bd20cadc184e753326ce339e28a570))
+* support tags completion ([fd08802](https://github.com/wsdjeg/zettelkasten.nvim/commit/fd08802d9106fd03942e4b2edd87d6f9f87ac20c))
+* use ctrl-y to insert note id from picker ([72672fd](https://github.com/wsdjeg/zettelkasten.nvim/commit/72672fd5c49e9b1d6c204fa4613dd8c11f029291))
+
+
+### Bug Fixes
+
+* add chinese description ([3ff8f91](https://github.com/wsdjeg/zettelkasten.nvim/commit/3ff8f917a785d88ab654d88e611973cc31b4b3b6))
+* add empty line after tags line ([25ccd0c](https://github.com/wsdjeg/zettelkasten.nvim/commit/25ccd0cccf62485643a787e962939f62379895fe))
+* add missing is_float function ([8a398f4](https://github.com/wsdjeg/zettelkasten.nvim/commit/8a398f4b61a202548b80b07b6293b7225261d957))
+* fix zettelkasten note time ([9292816](https://github.com/wsdjeg/zettelkasten.nvim/commit/92928168480c4f1b9684b0ea1cc94978b76156d2))
+* improve description ([8f432ea](https://github.com/wsdjeg/zettelkasten.nvim/commit/8f432ea3c0c421313f0d3f429cf5c95c4deac99c))
+* use browse api instead of command ([315b119](https://github.com/wsdjeg/zettelkasten.nvim/commit/315b119cd50e0a0cf6c8e9d0d7e35122c8c9887a))
+* use lua function in telescope extension ([1dfb089](https://github.com/wsdjeg/zettelkasten.nvim/commit/1dfb089e8506410e98532ba0de644f91200de98a))
+* use vim.cmd ([dd830fd](https://github.com/wsdjeg/zettelkasten.nvim/commit/dd830fdbc51912ab863883afab9b20248eddb524))
+
 ## [2.1.0](https://github.com/wsdjeg/zettelkasten.nvim/compare/v2.0.0...v2.1.0) (2025-11-23)
 
 
