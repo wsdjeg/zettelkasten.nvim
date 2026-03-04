@@ -22,7 +22,7 @@ function M.zettelkasten_create(action)
       error = 'the type of title should be string.',
     }
   end
-  
+
   if type(action.content) ~= 'string' then
     return {
       error = 'the type of content should be string.',
@@ -34,8 +34,8 @@ function M.zettelkasten_create(action)
 
   local content_lines = {
     string.format('# %s %s', id, action.title),
-    '',  -- 空行
-    action.content
+    '', -- 空行
+    action.content,
   }
 
   -- 添加标签（如果存在）
@@ -46,7 +46,7 @@ function M.zettelkasten_create(action)
         error = 'the type of tags should be table/array.',
       }
     end
-    
+
     local tags_str = 'tags:'
     for _, tag in ipairs(action.tags) do
       if type(tag) ~= 'string' then
@@ -66,7 +66,7 @@ function M.zettelkasten_create(action)
     if not file then
       error('failed to open file: ' .. filename)
     end
-    
+
     file:write(table.concat(content_lines, '\n'))
     file:close()
   end)
@@ -75,7 +75,9 @@ function M.zettelkasten_create(action)
     return {
       content = string.format(
         'zettelkasten note created successfully!\n\nID: %s\nTitle: %s\nPath: %s',
-        id, action.title, filename
+        id,
+        action.title,
+        filename
       ),
     }
   else
@@ -94,14 +96,31 @@ function M.scheme()
     ['function'] = {
       name = 'zettelkasten_create',
       description = [[
-      use @zk create <title> to create new zettelkasten note.
-      Supports adding tags to the note. This function creates a new note only when the user gives an explicit instruction (@zk create).
+Create a new zettelkasten note. Use @zk create command.
 
-      请严格遵循以下规则：
-      
-      1. 必须 user 明确发送消息包含新建笔记，在执行本工具。
-      2. 笔记 tags 少于等于 3 个，避免同义词
-      ]],
+⚠️ CRITICAL RESTRICTIONS - READ CAREFULLY:
+
+This tool MUST ONLY be called when the user EXPLICITLY requests to create a note.
+
+VALID triggers (user MUST say something like):
+- "创建笔记" / "新建笔记" / "记录笔记"
+- "保存为笔记" / "保存这个想法"  
+- "@zk create" or "zk create"
+
+🚫 FORBIDDEN uses - DO NOT CALL THIS TOOL FOR:
+- Generating code snippets
+- Storing conversation summaries  
+- Saving answers or explanations
+- ANY automated or proactive purposes
+- ANY purpose other than explicit user request to create a note
+
+If you are unsure whether to call this tool, DO NOT call it.
+
+Rules:
+1. Execute ONLY when user explicitly mentions creating a note
+2. Tags: maximum 3 tags, avoid synonyms, use English
+3. Title and content are required
+]],
       parameters = {
         type = 'object',
         properties = {
@@ -111,15 +130,15 @@ function M.scheme()
           },
           content = {
             type = 'string',
-            description = 'the note body of zettelkasten'
+            description = 'the note body of zettelkasten',
           },
           tags = {
             type = 'array',
             items = {
-              type = 'string'
+              type = 'string',
             },
-            description = 'Optional tags for the note (e.g., ["programming", "vim"]), the tag should be english.'
-          }
+            description = 'Optional tags for the note (e.g., ["programming", "vim"]), the tag should be english.',
+          },
         },
         required = { 'title', 'content' },
       },
