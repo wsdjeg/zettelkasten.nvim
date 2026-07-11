@@ -29,6 +29,16 @@ A [Zettelkasten](https://zettelkasten.de) note-taking plugin for Neovim, written
 - [📸 Screenshots](#-screenshots)
 - [📣 Self-Promotion](#-self-promotion)
 - [🙏 Credits](#-credits)
+    - [Module Structure](#module-structure)
+    - [Config](#config)
+    - [Main Module (`zettelkasten.lua`)](#main-module-zettelkastenlua)
+    - [Browser](#browser)
+    - [Formatter](#formatter)
+    - [Log](#log)
+    - [Plugin](#plugin)
+    - [ftplugin](#ftplugin)
+    - [Summary of New Features](#summary-of-new-features)
+    - [Summary of Improvements](#summary-of-improvements)
 - [💬 Feedback](#-feedback)
 
 <!-- vim-markdown-toc -->
@@ -267,30 +277,181 @@ Love this plugin? Follow [me](https://wsdjeg.net/) on
 
 This plugin is forked from [Furkanzmc/zettelkasten.nvim](https://github.com/Furkanzmc/zettelkasten.nvim).
 
-Summary of differences from the upstream fork:
+The fork has diverged significantly from the upstream. Below is a detailed module-by-module comparison.
 
-1. **New Features:**
-   - Clipboard image pasting (macOS/Linux/Windows)
-   - Tags completion support (`completefunc` & `tagfunc`)
-   - Tags sidebar window with foldable tag tree
-   - Configurable note browser title width
-   - Calendar.nvim extension
-   - Picker.nvim sources (notes, tags, templates)
-   - Telescope.nvim extensions (notes, tags, templates)
-   - LuaRocks support
-   - Lua syntax files for browser and tags tree
-   - `ZkHover` command for note preview
-   - Chat.nvim integration (`@zk create` / `@zk get`)
+### Module Structure
 
-2. **Improvements:**
-   - Many bug fixes (note time, highlight range, default actions, etc.)
-   - Consistent use of Lua API and `vim.cmd`
-   - Cleaner setup via `setup()` function (moved from `vim.g` to module config)
-   - Enhanced docs and README
+| Module | Upstream | Fork | Notes |
+| ------ | -------- | ---- | ----- |
+| `lua/zettelkasten.lua` | Public API | Public API (expanded) | See [Main Module](#main-module-zettelkastenlua) |
+| `lua/zettelkasten/config.lua` | Private table + `get()` | Module-level fields | See [Config](#config) |
+| `lua/zettelkasten/browser.lua` | Note parsing + caching | Note parsing + caching + browser window | See [Browser](#browser) |
+| `lua/zettelkasten/formatter.lua` | Format strings | Format strings + title truncation | See [Formatter](#formatter) |
+| `lua/zettelkasten/log.lua` | `vim.notify` wrapper | `logger.nvim` + `nvim-notify` | See [Log](#log) |
+| `lua/zettelkasten/sidebar.lua` | — | **New** Tags sidebar window | — |
+| `lua/zettelkasten/types.lua` | — | **New** Type definitions | — |
+| `lua/zettelkasten/util.lua` | — | **New** Highlight, clipboard image, syntax utils | — |
+| `lua/calendar/extensions/zettelkasten.lua` | — | **New** Calendar.nvim extension | — |
+| `lua/chat/tools/zettelkasten_create.lua` | — | **New** Chat.nvim create tool | — |
+| `lua/chat/tools/zettelkasten_get.lua` | — | **New** Chat.nvim get tool | — |
+| `lua/picker/sources/zettelkasten*.lua` | — | **New** Picker.nvim sources (3 files) | — |
+| `lua/telescope/_extensions/zettelkasten*.lua` | — | **New** Telescope extensions (3 files) | — |
+| `ftplugin/zktagstree.lua` | — | **New** Tags sidebar buffer settings | — |
+| `syntax/zktagstree.lua` | — | **New** Tags sidebar syntax | — |
+| `plugin/zettelkasten.lua` | Commands + BufReadCmd autocmd | Simplified command registration | See [Plugin](#plugin) |
 
-3. **Other Changes:**
-   - Release automation with release-please
-   - Better Neovim integration (filetype detection, keybindings, etc.)
+### Config
+
+**Upstream** uses a private `s_config` table accessed via `config.get()`:
+
+```lua
+-- Upstream
+local s_config = {
+    notes_path = "",
+    preview_command = "pedit",
+    browseformat = "%f - %h [%r Refs] [%b B-Refs] %t",
+    id_inference_location = M.TITLE,  -- TITLE (0) or FILENAME (1)
+    id_pattern = "%d+-%d+-%d+-%d+-%d+-%d+",
+    id_format = "%Y-%m-%d-%H-%M-%S",
+    filename_pattern = "%d+-%d+-%d+-%d+-%d+-%d+.md",
+    title_pattern = "# %d+-%d+-%d+-%d+-%d+-%d+ .+",
+}
+M.get = function() return s_config end
+```
+
+**Fork** uses module-level fields accessed directly:
+
+```lua
+-- Fork
+M.notes_path = '~/.zettelkasten/'
+M.template_dir = '~/.zettelkasten_template'
+M.browseformat = '%f - %h [%r Refs] [%b B-Refs] %t'
+M.preview_command = 'pedit'
+M.completion_kind = '[zettelkasten]'
+M.browse_title_width = 30
+```
+
+Key differences:
+
+| Aspect | Upstream | Fork |
+| ------ | -------- | ---- |
+| Access pattern | `config.get().notes_path` | `config.notes_path` |
+| `id_inference_location` | Configurable: `TITLE` (0) or `FILENAME` (1) | Hardcoded to title-based only |
+| `id_pattern` / `id_format` / `filename_pattern` / `title_pattern` | Configurable | Hardcoded as module-level locals in `browser.lua` and `zettelkasten.lua` |
+| Unknown key validation | Warns on unknown config keys | Silently ignores |
+| `template_dir` | — | **New** |
+| `completion_kind` | — | **New** |
+| `browse_title_width` | — | **New** |
+| `notes_path` default | `""` (empty string) | `'~/.zettelkasten/'` |
+
+### Main Module (`zettelkasten.lua`)
+
+| Function | Upstream | Fork | Details |
+| -------- | -------- | ---- | ------- |
+| `generate_note_id` | `(parent_id)` — uses `config.get().id_format`, supports string or function | `(date)` — uses hardcoded `NOTE_ID_STRFTIME_FORMAT`, supports custom date table | Fork allows creating notes with a specific date |
+| `set_note_id` | Checks `id_inference_location` for TITLE vs FILENAME | Always title-based; checks for duplicate IDs before writing | Fork adds duplicate ID guard |
+| `completefunc` | Note ID/title completion only | Note ID/title **and** tag completion (detects `#` prefix context) | Fork adds `complete_tags` flag and tag deduplication |
+| `get_note_browser_content` | No parameters | `(opt)` — supports `opt.tags` filter and `opt.date` filter | Fork enables tag/date-based browsing |
+| `add_hover_command` | `(bufnr)` — takes buffer number | `()` — operates on current buffer (`0`); adds shell completion for `-preview`/`-return-lines` flags | Fork uses `fargs` instead of `args` string |
+| `_internal_execute_hover_cmd` | Parses string args with `vim.split` | Iterates `fargs` table directly | Fork is cleaner with Neovim's `nargs = "*"` |
+| `zknew` | — | **New** Programmatic note creation with template support and custom date | Fork: `vim.api.nvim_create_buf` + `nvim_open_win` instead of `vim.cmd("new")` |
+| `paste_image` | — | **New** Clipboard image paste (macOS/Linux/Windows) | Fork uses `util.save_clipboard_image` |
+| `contains` | `(filename)` — checks if file is within `notes_path` | Removed | Not needed in fork's architecture |
+| `setup` | `opts.notes_path = opts.notes_path or ""` | `opts.notes_path = opts.notes_path or config.notes_path` | Fork preserves existing config as default |
+| Config access | `config.get().xxx` | `config.xxx` | Fork uses direct module fields |
+| Log calls | `log.notify(msg, log_levels.ERROR, {})` | `log.notify(msg, log_highlights.WARN)` | Fork uses string highlight names |
+
+### Browser
+
+| Aspect | Upstream | Fork |
+| ------ | -------- | ---- |
+| `get_files` | `(folder, filename_pattern)` — parameterized pattern | `(folder)` — hardcoded `ZK_FILE_NAME_PATTERN` |
+| `extract_id_and_title` | `(line, file_path, title_pattern, id_pattern, id_inference_location)` — 5 params, supports TITLE and FILENAME modes | `(line)` — no parameters, title-only mode, hardcoded patterns |
+| `get_note_information` | `(file_path, id_config)` — takes ID config table | `(file_path)` — no config parameter |
+| `get_notes` | Checks `fn.isdirectory(folder)` before listing | No directory check (relies on `globpath` returning empty) |
+| `browse` | — | **New** Opens browser window with tag/date filtering, sets buffer options |
+| `clear_cache` | — | **New** Clears note cache for testing |
+| File handle | Does not close file on empty read | Closes file on empty read (`file:close()`) |
+| Nil check | `file:read(0) == nil` without nil guard on `file` itself | `if file == nil then return nil end` before `file:read(0)` |
+| Tag regex | `(%#%a[%w-_]+)` | `(%#%a[%w-]+)` — removed underscore from second+ char class |
+
+### Formatter
+
+| Aspect | Upstream | Fork |
+| ------ | -------- | ---- |
+| `%h` (title) | Returns `line.title` as-is | Pads to `browse_title_width` or truncates with `...` |
+| Truncation | — | Uses `str2chars()` for proper CJK character width handling |
+| Line trimming | `vim.trim(cmps)` on each formatted line | No trimming |
+| Config dependency | None | Depends on `config.browse_title_width` |
+| Nil safety | `s_formatters[modifier](line)` may error on nil | `s_formatters[modifier](line) or ''` fallback |
+
+### Log
+
+| Aspect | Upstream | Fork |
+| ------ | -------- | ---- |
+| Backend | `vim.notify` | `logger.nvim` (lazy-loaded) for `info/debug/warn/error` |
+| Notification | `vim.notify(tag .. msg, level, opts)` | `nvim-notify` (lazy-loaded) via `notify(msg, highlight)` |
+| Log levels | `vim.log.levels` (numeric) | String highlight names (`'Normal'`, `'Error'`, `'WarningMsg'`) |
+| `set_level` | Configurable log level threshold | Not available (uses logger.nvim's own config) |
+| Tag/prefix | `opts.tag or "[zettelkasten]"` | Handled by logger.nvim's `derive('zettelkasten')` |
+
+### Plugin
+
+| Aspect | Upstream | Fork |
+| ------ | -------- | ---- |
+| `ZkNew` | `vim.cmd("new \| setlocal filetype=markdown")` + `lcd` + `normal ggI# New Note` + `set_note_id` | Calls `M.zknew({})` — programmatic buffer creation with `nvim_create_buf` + `nvim_open_win` |
+| `ZkBrowse` | `vim.cmd("edit zk://browser")` + `BufReadCmd` autocmd | Calls `browser.browse(opts)` directly; supports `nargs = "*"` for tag filtering |
+| `BufReadCmd` autocmd | Yes — fills browser content via autocmd | Removed — browser content handled by `browser.browse()` |
+| `_G.zettelkasten` | `tagfunc`, `completefunc` | `tagfunc`, `completefunc`, `zknew`, `zkbrowse` |
+
+### ftplugin
+
+| Aspect | Upstream `markdown.lua` | Fork `markdown.lua` |
+| ------ | ----------------------- | ------------------- |
+| Guard | Sets options unconditionally | Only applies to buffers matching zettelkasten ID pattern (`\d\d\d\d-\d\d-\d\d-\d\d-\d\d-\d\d\.md`) |
+| `tagfunc` / `completefunc` | Conditional (`if == ""`) | Always set (no conditional check) |
+| `keywordprg` | Conditional (`if == ""`) | Always set to `:ZkHover` |
+| `<leader>p` (paste image) | — | **New** keymap for clipboard image paste |
+| `add_hover_command` | `(bufnr)` | `()` (current buffer) |
+
+| Aspect | Upstream `zkbrowser.lua` | Fork `zkbrowser.lua` |
+| ------ | ------------------------ | -------------------- |
+| `modifiable` | `true` | `false` (read-only browser) |
+| `buflisted` | `true` | `false` |
+| `q` key | — | **New** Close browser (`b#` fallback to `bd`) |
+| `<C-l>` | — | **New** Clear tag filter and reload |
+| `<LeftRelease>` | — | **New** Filter notes by tag under cursor |
+| `<F2>` | — | **New** Open tags sidebar |
+| `<Enter>` | — | **New** Open note (`normal 0gf`) |
+| `BufEnter` autocmd | — | **New** Force `buflisted = false` (workaround) |
+| `util` import | — | **New** For `syntax_at()` and `is_last_win()` |
+| `lcd` notes_path | Conditional on `isdirectory` | Conditional on `notes_path ~= ""` |
+
+### Summary of New Features
+
+1. **Tags Sidebar** (`sidebar.lua`) — Foldable tag tree window for visual tag-based filtering
+2. **Tag Completion** — `completefunc` detects `#` prefix and completes tags instead of note IDs
+3. **Clipboard Image Paste** — `paste_image()` with platform-specific commands (macOS/Linux/Windows)
+4. **Note Templates** — `zknew(opt)` supports `opt.template` for pre-defined note content
+5. **Custom Date Notes** — `zknew(opt)` supports `opt.date` for creating notes with a specific date
+6. **Calendar Integration** — `calendar/extensions/zettelkasten.lua` highlights dates with notes
+7. **Picker.nvim Sources** — 3 sources: notes, tags, templates
+8. **Telescope.nvim Extensions** — 3 extensions: notes, tags, templates
+9. **Chat.nvim Integration** — `@zk create` and `@zk get` tools
+10. **Configurable Title Width** — `browse_title_width` for browser column alignment
+11. **LuaRocks Support** — Installable via `luarocks install zettelkasten.nvim`
+12. **Release Automation** — release-please for automated changelog and versioning
+
+### Summary of Improvements
+
+1. **Nil safety** — Added nil checks for file handles and note titles
+2. **Resource cleanup** — File handles are closed on empty reads
+3. **Duplicate ID guard** — `set_note_id` checks for existing notes before writing
+4. **Browser read-only** — Browser buffer is `modifiable = false` and `buflisted = false`
+5. **Richer keybindings** — `q`, `<Enter>`, `<C-l>`, `<F2>`, `<LeftRelease>` in browser
+6. **Title truncation** — Browser titles padded/truncated with CJK-aware width calculation
+7. **Richer logging** — Integration with `logger.nvim` and `nvim-notify`
+8. **Test suite** — Comprehensive unit tests with `luaunit`
 
 ## 💬 Feedback
 
