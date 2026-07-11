@@ -65,6 +65,8 @@ Release-please creates a PR on branch `release-please--branches--master`. To re-
 6. `@git_checkout branch="master"` - switch back to master
 7. `@git_merge branch="release-please--branches--master"` - merge release PR into master
 
+**Never manually create or push tags.** Release-please automatically creates tags and GitHub Releases when the release PR is merged. Do not run `@git_tag` or `@git_push tags=true` during the release process.
+
 ---
 
 ## Forbidden Files
