@@ -17,6 +17,13 @@ local ZK_FILE_NAME_PATTERN = '%d+-%d+-%d+-%d+-%d+-%d+.md'
 local s_note_cache_with_file_path = {}
 local s_note_cache_with_id = {}
 
+--- Clear all cached notes. Useful for testing or when notes are
+--- modified externally.
+function M.clear_cache()
+  s_note_cache_with_file_path = {}
+  s_note_cache_with_id = {}
+end
+
 -- list all zettelkasten notes in specific folder
 local function get_files(folder)
   local files = fn.split(fn.globpath(folder, '*.md'), '\\n')
