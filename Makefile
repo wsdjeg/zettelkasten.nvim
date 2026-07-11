@@ -14,8 +14,9 @@ help:
 	@echo "  make test PATTERN=test/zettelkasten/config_spec.lua  # Full path"
 
 # Install all test dependencies (cross-platform, uses Lua)
+# Use -u NONE to avoid loading user config which may pollute project directory
 install-deps:
-	@nvim --headless -c "lua dofile('test/install_deps.lua')" -c "qa!"
+	@nvim --headless -u NONE -c "lua dofile('test/install_deps.lua')" -c "qa!"
 
 # Alias for individual dependency install
 install-luaunit: install-deps
