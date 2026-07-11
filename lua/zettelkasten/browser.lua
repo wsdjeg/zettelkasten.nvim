@@ -124,7 +124,12 @@ local function get_note_information(file_path)
   end
 
   local file = io.open(file_path, 'r')
+  if file == nil then
+    return nil
+  end
+
   if file:read(0) == nil then
+    file:close()
     return nil
   end
 
@@ -171,7 +176,7 @@ local function get_note_information(file_path)
     ::continue::
   end
 
-  if info.id ~= nil then
+  if info.id ~= nil and info.id ~= '' then
     s_note_cache_with_file_path[file_path] = info
     s_note_cache_with_id[info.id] = info
   end
@@ -200,7 +205,10 @@ function M.get_notes()
   local files = get_files(folder)
   local all_notes = {}
   for _, file in ipairs(files) do
-    table.insert(all_notes, get_note_information(file))
+    local note = get_note_information(file)
+    if note ~= nil then
+      table.insert(all_notes, note)
+    end
   end
 
   for _, note in ipairs(all_notes) do

@@ -10,7 +10,11 @@ vim.api.nvim_create_user_command('ZkNew', function(opt)
 end, {})
 
 vim.api.nvim_create_user_command('ZkBrowse', function(opt)
-  require('zettelkasten.browser').browse(opt.fargs)
+  local opts = {}
+  if #opt.fargs > 0 then
+    opts.tags = opt.fargs
+  end
+  require('zettelkasten.browser').browse(opts)
 end, { nargs = '*' })
 _G.zettelkasten = {
   tagfunc = require('zettelkasten').tagfunc,

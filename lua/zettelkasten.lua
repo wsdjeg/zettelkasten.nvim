@@ -124,8 +124,11 @@ function M.completefunc(find_start, base)
     end
   else
     local notes = vim.tbl_filter(function(note)
-      -- here the note sometimes do not have title, then it is nil
-      return string.match(note.title, base)
+      -- guard against nil title (malformed notes)
+      if note.title == nil then
+        return false
+      end
+      return string.match(note.title, base) ~= nil
     end, browser.get_notes())
 
     for _, ref in ipairs(notes) do
@@ -145,24 +148,30 @@ end
 function M.set_note_id(bufnr, date)
   local first_line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, true)[1]
   local zk_id = M.generate_note_id(date)
-  if #zk_id > 0 then
-    first_line, _ = string.gsub(first_line, '# ', '')
-    api.nvim_buf_set_lines(
-      bufnr,
-      0,
-      1,
-      true,
-      { '# ' .. zk_id .. ' ' .. first_line }
-    )
-    vim.api.nvim_buf_set_name(bufnr, zk_id .. '.md')
-    vim.api.nvim_set_option_value('filetype', 'markdown', { buf = bufnr })
-  else
+  if zk_id == nil or #zk_id == 0 then
+    log.notify('Failed to generate note ID.', log_highlights.WARN)
+    return
+  end
+
+  -- Check if a note with this ID already exists
+  if browser.get_note(zk_id) ~= nil then
     log.notify(
       "There's already a note with the same ID.",
-      log_highlights.WARN,
-      {}
+      log_highlights.WARN
     )
+    return
   end
+
+  first_line, _ = string.gsub(first_line, '# ', '')
+  api.nvim_buf_set_lines(
+    bufnr,
+    0,
+    1,
+    true,
+    { '# ' .. zk_id .. ' ' .. first_line }
+  )
+  vim.api.nvim_buf_set_name(bufnr, zk_id .. '.md')
+  vim.api.nvim_set_option_value('filetype', 'markdown', { buf = bufnr })
 end
 
 function M.tagfunc(pattern, flags, info)
@@ -217,7 +226,7 @@ function M.keyword_expr(word, opts)
 
   local note = browser.get_note(word)
   if note == nil then
-    log.notify('Cannot find note.', log_highlights.WARN, {})
+    log.notify('Cannot find note.', log_highlights.WARN)
     return {}
   end
 
@@ -239,16 +248,6 @@ function M.get_back_references(note_id)
     return {}
   end
 
-  local title_cache = {}
-  local get_title = function(id)
-    if title_cache[id] ~= nil then
-      return title_cache[id]
-    end
-
-    title_cache[id] = browser.get_note(id).title
-    return title_cache[id]
-  end
-
   local references = {}
   for _, back_reference in ipairs(note.back_references) do
     table.insert(references, {
@@ -266,7 +265,7 @@ function M.show_back_references(cword, use_loclist)
   use_loclist = use_loclist or false
   local references = M.get_back_references(cword)
   if #references == 0 then
-    log.notify('No back references found.', log_highlights.WARN, {})
+    log.notify('No back references found.', log_highlights.WARN)
     return
   end
 
@@ -306,6 +305,9 @@ function M.get_toc(note_id, format)
       file_name = note.file_name,
       id = note.id,
       title = note.title,
+      references = note.references or {},
+      back_references = note.back_references or {},
+      tags = note.tags or {},
     })
   end
 
@@ -314,7 +316,8 @@ end
 
 function M.paste_image()
   local id = M.generate_note_id()
-  local filename = config.notes_path .. '/' .. id .. '.png'
+  local base = vim.fn.expand(config.notes_path)
+  local filename = vim.fn.fnamemodify(base .. '/' .. id .. '.png', ':p')
   if require('zettelkasten.util').save_clipboard_image(filename) then
     local text = '![' .. id .. '](' .. id .. '.png)'
     local reg = vim.fn.getreg('"')
@@ -328,8 +331,7 @@ function M.get_note_browser_content(opt)
   if config.notes_path == '' then
     log.notify(
       "'notes_path' option is required for note browsing.",
-      log_highlights.WARN,
-      {}
+      log_highlights.WARN
     )
     return {}
   end
@@ -421,7 +423,7 @@ function M._internal_execute_hover_cmd(args)
     return_lines = vim.tbl_contains(args, '-return-lines'),
   })
   if #lines > 0 then
-    log.notify(table.concat(lines, '\n'), log_highlights.INFO, {})
+    log.notify(table.concat(lines, '\n'), log_highlights.INFO)
   end
 end
 
@@ -465,7 +467,7 @@ end
 
 function M.setup(opts)
   opts = opts or {}
-  opts.notes_path = opts.notes_path or ''
+  opts.notes_path = opts.notes_path or config.notes_path
 
   config._set(opts)
 end

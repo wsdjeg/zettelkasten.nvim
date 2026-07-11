@@ -69,5 +69,20 @@ function TestConfig:test_set_with_empty_opts()
   lu.assertEquals(config.browseformat, before)
 end
 
+function TestConfig:test_default_template_dir()
+  lu.assertEquals(config.template_dir, '~/.zettelkasten_template')
+end
+
+function TestConfig:test_set_updates_template_dir()
+  config._set({ template_dir = '/tmp/templates' })
+  lu.assertEquals(config.template_dir, '/tmp/templates')
+end
+
+function TestConfig:test_set_does_not_create_templates_path()
+  -- Ensure _set does not create a stale templates_path field
+  config._set({ notes_path = '/tmp/test' })
+  lu.assertNil(config.templates_path)
+end
+
 -- Tests are collected and run by test/run.lua
 

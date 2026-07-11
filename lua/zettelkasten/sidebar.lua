@@ -40,6 +40,9 @@ local function sort_tags(tags)
 
   for _, tag in ipairs(vim.fn.sort(tags)) do
     local k = string.upper(string.sub(tag, 2, 2))
+    if k == '' then
+      k = '?'
+    end
     if atags[k] then
       table.insert(atags[k], tag)
     else
@@ -92,7 +95,11 @@ function M.open_tag_tree()
 end
 
 function M.toggle_folded_key()
-  local k = string.sub(vim.fn.getline('.'), 5, 5)
+  local line = vim.fn.getline('.')
+  local k = string.sub(line, 5, 5)
+  if k == '' then
+    return
+  end
   if folded_keys[k] then
     folded_keys[k] = false
   else

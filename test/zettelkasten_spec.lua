@@ -75,13 +75,11 @@ function TestZettelkasten:test_setup_sets_notes_path()
   config._set({ notes_path = test_notes_dir })
 end
 
---- Test setup with nil opts
+--- Test setup with nil opts preserves existing notes_path
 function TestZettelkasten:test_setup_with_nil()
   local before = config.notes_path
   zk.setup(nil)
-  lu.assertEquals(config.notes_path, '')
-  -- restore
-  config._set({ notes_path = before })
+  lu.assertEquals(config.notes_path, before)
 end
 
 --- Test get_note_browser_content returns empty for empty notes dir
@@ -178,6 +176,62 @@ function TestZettelkasten:test_get_back_references_with_refs()
   local refs = zk.get_back_references('2024-01-02-12-00-00')
   lu.assertTrue(#refs >= 1)
   lu.assertEquals(refs[1].id, '2024-01-01-12-00-00')
+end
+
+--- Test get_back_references includes title and file_name
+function TestZettelkasten:test_get_back_references_includes_fields()
+  write_note(test_notes_dir, '2024-01-01-12-00-00', {
+    '# 2024-01-01-12-00-00 Note One',
+    '',
+    'See [[2024-01-02-12-00-00]]',
+  })
+  write_note(test_notes_dir, '2024-01-02-12-00-00', {
+    '# 2024-01-02-12-00-00 Note Two',
+    '',
+    'Content',
+  })
+
+  local refs = zk.get_back_references('2024-01-02-12-00-00')
+  lu.assertTrue(#refs >= 1)
+  lu.assertEquals(refs[1].title, 'Note One')
+  lu.assertNotNil(refs[1].file_name)
+  lu.assertNotNil(refs[1].linenr)
+end
+
+--- Test setup with empty table preserves existing notes_path
+function TestZettelkasten:test_setup_with_empty_table()
+  local before = config.notes_path
+  zk.setup({})
+  lu.assertEquals(config.notes_path, before)
+end
+
+--- Test get_toc returns formatted lines
+function TestZettelkasten:test_get_toc_returns_lines()
+  write_note(test_notes_dir, '2024-01-01-12-00-00', {
+    '# 2024-01-01-12-00-00 Note One',
+    '',
+    'See [[2024-01-02-12-00-00]]',
+  })
+  write_note(test_notes_dir, '2024-01-02-12-00-00', {
+    '# 2024-01-02-12-00-00 Note Two',
+    '',
+    'Content',
+  })
+
+  local toc = zk.get_toc('2024-01-02-12-00-00')
+  lu.assertTrue(#toc >= 1)
+  -- default format is '- [%h](%d)', should contain the title and id
+  lu.assertTrue(string.find(toc[1], 'Note One', 1, true) ~= nil)
+  lu.assertTrue(string.find(toc[1], '2024-01-01-12-00-00', 1, true) ~= nil)
+end
+
+--- Test get_note_browser_content returns empty when notes_path is empty
+function TestZettelkasten:test_get_note_browser_content_empty_path()
+  local saved_path = config.notes_path
+  config._set({ notes_path = '' })
+  local content = zk.get_note_browser_content({ tags = {} })
+  lu.assertEquals(#content, 0)
+  config._set({ notes_path = saved_path })
 end
 
 -- Tests are collected and run by test/run.lua

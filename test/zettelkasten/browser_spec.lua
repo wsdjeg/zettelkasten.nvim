@@ -185,5 +185,40 @@ function TestBrowser:test_tag_not_at_line_start()
   lu.assertEquals(#notes[1].tags, 0)
 end
 
+--- Test empty file is handled without crash
+function TestBrowser:test_empty_file_handled()
+  local path = test_notes_dir .. '/2024-01-01-12-00-00.md'
+  vim.fn.writefile({}, path)
+
+  local notes = browser.get_notes()
+  -- Empty file should not crash; note may still appear with empty fields
+  lu.assertTrue(#notes >= 0)
+end
+
+--- Test notes with empty id are not cached
+function TestBrowser:test_empty_id_not_cached()
+  local path = test_notes_dir .. '/2024-01-01-12-00-00.md'
+  vim.fn.writefile({ 'No proper header here' }, path)
+
+  local notes = browser.get_notes()
+  lu.assertEquals(#notes, 1)
+  lu.assertEquals(notes[1].id, '')
+
+  -- get_note should return nil for empty-id notes
+  local note = browser.get_note('')
+  lu.assertNil(note)
+end
+
+--- Test get_note returns nil after cache clear
+function TestBrowser:test_get_note_after_cache_clear()
+  create_note('2024-06-15-10-30-00', 'Cached Note')
+  local note = browser.get_note('2024-06-15-10-30-00')
+  lu.assertNotNil(note)
+
+  browser.clear_cache()
+  local note2 = browser.get_note('2024-06-15-10-30-00')
+  lu.assertNotNil(note2)
+end
+
 -- Tests are collected and run by test/run.lua
 

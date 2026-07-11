@@ -22,7 +22,7 @@ M._set = function(opts)
   M.preview_command = opts.preview_command or M.preview_command
   M.browseformat = opts.browseformat or M.browseformat
   M.completion_kind = opts.completion_kind or M.completion_kind
-  M.templates_path = opts.templates_path or M.templates_path
+  M.template_dir = opts.template_dir or M.template_dir
   M.browse_title_width = opts.browse_title_width or M.browse_title_width
 end
 
