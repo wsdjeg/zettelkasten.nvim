@@ -51,7 +51,7 @@ telescope.nvim, calendar.nvim, and chat.nvim.
 - **🖼️ Clipboard Image Paste** - Paste images from clipboard directly into notes (macOS/Linux/Windows)
 - **🔍 Multi-Picker Support** - Integrates with [picker.nvim](https://github.com/wsdjeg/picker.nvim) and [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)
 - **📅 Calendar Integration** - Highlights dates with notes via [calendar.nvim](https://github.com/wsdjeg/calendar.nvim)
-- **💬 Chat Integration** - Create and retrieve notes via [chat.nvim](https://github.com/wsdjeg/chat.nvim)
+- **💬 Chat Integration** - Create, retrieve, and update notes via [chat.nvim](https://github.com/wsdjeg/chat.nvim)
 - **🧩 Note Templates** - Create notes from pre-defined templates
 
 ## 📦 Installation
@@ -201,7 +201,7 @@ When pressing `<Enter>` on a date in the calendar, the following actions are ava
 
 ## 💬 Chat Integration
 
-zettelkasten.nvim provides two tools for [chat.nvim](https://github.com/wsdjeg/chat.nvim):
+zettelkasten.nvim provides three tools for [chat.nvim](https://github.com/wsdjeg/chat.nvim):
 
 ### Create Notes
 
@@ -234,6 +234,37 @@ tags: #tag1 #tag2
 ```
 
 Retrieves zettelkasten notes by tags. Returns a JSON array of matching notes with `file_name` and `title` fields.
+
+### Update Notes
+
+```
+@zk update <id> <action> [parameters]
+```
+
+Updates an existing zettelkasten note with partial modifications — no need to pass the full note content.
+
+**Parameters:**
+
+- `id` (string, required): The note ID (e.g., `"2024-01-15-10-30-00"`)
+- `action` (string, required): One of the following:
+
+| Action          | Description                          | Extra Parameters                          |
+| --------------- | ------------------------------------ | ----------------------------------------- |
+| `update_title`  | Change the note title (ID preserved) | `title` (string, required)                |
+| `add_tags`      | Add tags (duplicates skipped)        | `tags` (string[], required)               |
+| `remove_tags`   | Remove tags (removes line if empty)  | `tags` (string[], required)               |
+| `replace_text`  | Find/replace in note body            | `old_text` (string), `new_text` (string)  |
+
+Tags can be provided with or without `#` prefix. For `replace_text`, the title line (line 1) is skipped. Use empty `new_text` to delete text.
+
+**Examples:**
+
+```
+@zk update id="2024-01-15-10-30-00" action="update_title" title="New Title"
+@zk update id="2024-01-15-10-30-00" action="add_tags" tags=["python", "web"]
+@zk update id="2024-01-15-10-30-00" action="remove_tags" tags=["old-tag"]
+@zk update id="2024-01-15-10-30-00" action="replace_text" old_text="old code" new_text="new code"
+```
 
 ## 🐞 Debug
 
