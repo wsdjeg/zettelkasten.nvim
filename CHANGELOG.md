@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.3.0](https://github.com/wsdjeg/zettelkasten.nvim/compare/v2.2.0...v2.3.0) (2026-07-18)
+
+
+### Features
+
+* **zettelkasten_update:** add partial note update tool for chat.nvim ([8965ca5](https://github.com/wsdjeg/zettelkasten.nvim/commit/8965ca5f8816304b78e32a284fda5e4838a6d2b1))
+
+
+### Documentation
+
+* add detailed upstream comparison to README Credits section ([164ddba](https://github.com/wsdjeg/zettelkasten.nvim/commit/164ddba0378d3f08e1a34a063e74daca38d68237))
+* add rule against manual tag creation in release process ([325a562](https://github.com/wsdjeg/zettelkasten.nvim/commit/325a5620a678becee05a78f710bf07875c0c7f21))
+* **chat:** document zettelkasten_update tool in README ([96bda75](https://github.com/wsdjeg/zettelkasten.nvim/commit/96bda7525cfd3c61010aee7cb2afda34b92b3847))
+* revamp README with test badge and reorganized content ([8397575](https://github.com/wsdjeg/zettelkasten.nvim/commit/83975758366fa8ea8690d6715e1a7e2da8edb4a1))
+* simplify credits section with concise bullet lists ([8ff58a8](https://github.com/wsdjeg/zettelkasten.nvim/commit/8ff58a80867c2247165bb3f821a4ce89e3c5a8ec))
+
 ## [2.2.0](https://github.com/wsdjeg/zettelkasten.nvim/compare/v2.1.0...v2.2.0) (2026-07-11)
 
 
