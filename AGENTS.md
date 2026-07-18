@@ -137,7 +137,7 @@ end
 return TestExample
 ```
 
-CI runs on push to master and PRs.
+CI runs on push to master and PRs, across Neovim nightly/stable, ubuntu/windows/macos.
 
 ---
 
@@ -145,35 +145,61 @@ CI runs on push to master and PRs.
 
 ```
 zettelkasten.nvim/
-├── lua/zettelkasten/
-│   ├── browser.lua      # Note browser window logic
-│   ├── config.lua       # Setup & configuration
-│   ├── formatter.lua    # Note formatting & ID generation
-│   ├── log.lua          # Logging (logger.nvim integration)
-│   ├── sidebar.lua      # Tags sidebar window
-│   ├── types.lua        # Type definitions
-│   └── util.lua         # Utility functions
-├── plugin/              # Command definitions (ZkNew, ZkBrowse)
-├── ftdetect/            # Filetype detection for zettelkasten notes
-├── ftplugin/            # Filetype-specific settings
-├── syntax/              # Syntax files for zettelkasten notes
-├── doc/                 # Vim help docs
+├── lua/
+│   ├── zettelkasten.lua        # Main module (setup, commands, hover)
+│   ├── zettelkasten/
+│   │   ├── browser.lua          # Note browser window logic
+│   │   ├── config.lua           # Setup & configuration
+│   │   ├── formatter.lua        # Note formatting & ID generation
+│   │   ├── log.lua              # Logging (logger.nvim integration)
+│   │   ├── sidebar.lua          # Tags sidebar window
+│   │   ├── types.lua            # Type definitions
+│   │   └── util.lua             # Utility functions
+│   ├── chat/tools/              # chat.nvim integration tools
+│   │   ├── zettelkasten_create.lua
+│   │   ├── zettelkasten_get.lua
+│   │   └── zettelkasten_update.lua
+│   ├── picker/sources/          # picker.nvim sources
+│   ├── telescope/_extensions/   # telescope.nvim extensions
+│   └── calendar/extensions/     # calendar.nvim extension
+├── plugin/                      # Command definitions (ZkNew, ZkBrowse)
+├── ftdetect/                    # Filetype detection for zettelkasten notes
+├── ftplugin/                    # Filetype-specific settings
+├── syntax/                      # Syntax files for zettelkasten notes
+├── doc/                         # Vim help docs
 ├── test/
-│   ├── minimal_init.lua
-│   ├── run.lua
-│   ├── install_deps.lua
-│   ├── zettelkasten/    # Unit tests per module
-│   └── deps/            # Test dependencies
+│   ├── minimal_init.lua         # Headless test minimal config
+│   ├── run.lua                  # Test runner with PATTERN support
+│   ├── install_deps.lua         # Cross-platform dependency installer
+│   ├── example_spec.lua         # Example test file
+│   ├── zettelkasten/            # Unit tests per module
+│   │   ├── browser_spec.lua
+│   │   ├── config_spec.lua
+│   │   ├── formatter_spec.lua
+│   │   ├── sidebar_spec.lua
+│   │   └── util_spec.lua
+│   ├── chat/tools/              # chat integration tests
+│   │   └── zettelkasten_update_spec.lua
+│   ├── zettelkasten_spec.lua    # Main module tests
+│   └── .deps/                   # Test dependencies (gitignored)
+├── .github/
+│   ├── workflows/
+│   │   ├── test.yml             # CI test workflow
+│   │   ├── luarocks.yml         # LuaRocks publish workflow
+│   │   └── release-please.yml   # Automated release workflow
+│   ├── release-please-config.json
+│   └── release-please-manifest.json
 ├── Makefile
 ├── README.md
 ├── AGENTS.md
-└── CHANGELOG.md         # Auto-generated, DO NOT EDIT
+└── CHANGELOG.md                 # Auto-generated, DO NOT EDIT
 ```
 
 ### Key Modules
 
 | Module | Responsibility |
 |--------|---------------|
+| `zettelkasten` | Main module: setup, commands, hover, completion |
 | `config` | User setup, default options (`notes_path`, `browseformat`, `preview_command`, etc.) |
 | `browser` | Browse window: list notes, filter by tags, keybindings, preview |
 | `formatter` | Note ID generation, title parsing, content formatting |
@@ -190,5 +216,8 @@ zettelkasten.nvim/
 
 ### Chat Integration
 
-zettelkasten.nvim provides a `zettelkasten_create` tool for [chat.nvim](https://github.com/wsdjeg/chat.nvim). The `@zk create` command creates notes with auto-generated IDs and tag support.
+zettelkasten.nvim provides three tools for [chat.nvim](https://github.com/wsdjeg/chat.nvim):
+- `@zk create` - Create notes with auto-generated IDs and tag support
+- `@zk get` - Retrieve notes by tags
+- `@zk update` - Update notes with partial modifications (title, tags, text replacement)
 

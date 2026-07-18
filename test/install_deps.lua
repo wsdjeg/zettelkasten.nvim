@@ -40,7 +40,7 @@ local function download(url, dest)
   return false
 end
 
-local deps_dir = 'test/deps'
+local deps_dir = 'test/.deps'
 mkdir(deps_dir)
 
 -- Install luaunit
