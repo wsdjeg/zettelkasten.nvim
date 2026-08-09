@@ -301,6 +301,120 @@ function TestZettelkastenUpdate:test_replace_text_skips_title_line()
   lu.assertEquals(lines[3], 'Changed body')
 end
 
+-- ============== delete_note ==============
+
+function TestZettelkastenUpdate:test_delete_note_basic()
+  local path = create_note('2024-01-01-12-00-00', 'Test Note', nil, 'Content')
+
+  local result = update_tool.zettelkasten_update({
+    id = '2024-01-01-12-00-00',
+    action = 'delete_note',
+  })
+
+  lu.assertFalse(result.error ~= nil, 'should not return error')
+  lu.assertNotNil(result.content)
+  -- file should no longer exist
+  lu.assertEquals(vim.fn.filereadable(path), 0)
+end
+
+function TestZettelkastenUpdate:test_delete_note_with_tags()
+  local path = create_note('2024-01-01-12-00-00', 'Test Note', { 'tag1', 'tag2' }, 'Content')
+
+  local result = update_tool.zettelkasten_update({
+    id = '2024-01-01-12-00-00',
+    action = 'delete_note',
+  })
+
+  lu.assertFalse(result.error ~= nil, 'should not return error')
+  lu.assertEquals(vim.fn.filereadable(path), 0)
+end
+
+function TestZettelkastenUpdate:test_delete_note_not_found()
+  local result = update_tool.zettelkasten_update({
+    id = '9999-99-99-99-99-99',
+    action = 'delete_note',
+  })
+
+  lu.assertNotNil(result.error)
+end
+
+-- ============== override_content ==============
+
+function TestZettelkastenUpdate:test_override_content_basic()
+  create_note('2024-01-01-12-00-00', 'Test Note', { 'old-tag' }, 'Old content')
+
+  local result = update_tool.zettelkasten_update({
+    id = '2024-01-01-12-00-00',
+    action = 'override_content',
+    content = 'New content here',
+  })
+
+  lu.assertFalse(result.error ~= nil, 'should not return error')
+  local lines = read_file_lines(test_notes_dir .. '/2024-01-01-12-00-00.md')
+  -- line 1: title preserved, line 2: empty, line 3: new content
+  lu.assertEquals(lines[1], '# 2024-01-01-12-00-00 Test Note')
+  lu.assertEquals(lines[2], '')
+  lu.assertEquals(lines[3], 'New content here')
+end
+
+function TestZettelkastenUpdate:test_override_content_preserves_title()
+  create_note('2024-01-01-12-00-00', 'Original Title', nil, 'Old body')
+
+  update_tool.zettelkasten_update({
+    id = '2024-01-01-12-00-00',
+    action = 'override_content',
+    content = 'Completely new body',
+  })
+
+  local lines = read_file_lines(test_notes_dir .. '/2024-01-01-12-00-00.md')
+  lu.assertEquals(lines[1], '# 2024-01-01-12-00-00 Original Title')
+  lu.assertEquals(lines[3], 'Completely new body')
+end
+
+function TestZettelkastenUpdate:test_override_content_multiline()
+  create_note('2024-01-01-12-00-00', 'Test Note', nil, 'Old content')
+
+  update_tool.zettelkasten_update({
+    id = '2024-01-01-12-00-00',
+    action = 'override_content',
+    content = 'Line A\nLine B\nLine C',
+  })
+
+  local lines = read_file_lines(test_notes_dir .. '/2024-01-01-12-00-00.md')
+  lu.assertEquals(lines[1], '# 2024-01-01-12-00-00 Test Note')
+  lu.assertEquals(lines[2], '')
+  lu.assertEquals(lines[3], 'Line A')
+  lu.assertEquals(lines[4], 'Line B')
+  lu.assertEquals(lines[5], 'Line C')
+end
+
+function TestZettelkastenUpdate:test_override_content_empty_string()
+  create_note('2024-01-01-12-00-00', 'Test Note', { 'tag' }, 'Old content')
+
+  local result = update_tool.zettelkasten_update({
+    id = '2024-01-01-12-00-00',
+    action = 'override_content',
+    content = '',
+  })
+
+  lu.assertFalse(result.error ~= nil, 'should not return error')
+  local lines = read_file_lines(test_notes_dir .. '/2024-01-01-12-00-00.md')
+  -- title line preserved, plus empty separator line
+  lu.assertEquals(lines[1], '# 2024-01-01-12-00-00 Test Note')
+  lu.assertEquals(#lines, 2)
+end
+
+function TestZettelkastenUpdate:test_override_content_missing_content()
+  create_note('2024-01-01-12-00-00', 'Test Note')
+
+  local result = update_tool.zettelkasten_update({
+    id = '2024-01-01-12-00-00',
+    action = 'override_content',
+  })
+
+  lu.assertNotNil(result.error)
+end
+
 -- ============== error cases ==============
 
 function TestZettelkastenUpdate:test_missing_id()
@@ -349,6 +463,19 @@ function TestZettelkastenUpdate:test_scheme_required_fields()
   local required = scheme['function'].parameters.required
   lu.assertTrue(vim.tbl_contains(required, 'id'))
   lu.assertTrue(vim.tbl_contains(required, 'action'))
+end
+
+function TestZettelkastenUpdate:test_scheme_includes_new_actions()
+  local scheme = update_tool.scheme()
+  local enum = scheme['function'].parameters.properties.action.enum
+  lu.assertTrue(vim.tbl_contains(enum, 'delete_note'))
+  lu.assertTrue(vim.tbl_contains(enum, 'override_content'))
+end
+
+function TestZettelkastenUpdate:test_scheme_includes_content_param()
+  local scheme = update_tool.scheme()
+  lu.assertNotNil(scheme['function'].parameters.properties.content)
+  lu.assertEquals(scheme['function'].parameters.properties.content.type, 'string')
 end
 
 -- Tests are collected and run by test/run.lua

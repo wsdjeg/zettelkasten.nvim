@@ -114,10 +114,12 @@ function M.zettelkasten_update(action)
     add_tags = true,
     remove_tags = true,
     replace_text = true,
+    delete_note = true,
+    override_content = true,
   }
   if not action.action or not valid_actions[action.action] then
     return {
-      error = 'action is required and must be one of: update_title, add_tags, remove_tags, replace_text.',
+      error = 'action is required and must be one of: update_title, add_tags, remove_tags, replace_text, delete_note, override_content.',
     }
   end
 
@@ -128,13 +130,29 @@ function M.zettelkasten_update(action)
   end
 
   local file_path = note.file_name
+
+  -- clear browser cache so next get_notes() re-reads from disk
+  browser.clear_cache()
+
+  -- delete_note: remove the file entirely, no need to read/write lines
+  if action.action == 'delete_note' then
+    local ok, err = os.remove(file_path)
+    if not ok then
+      return { error = 'failed to delete note file: ' .. file_path .. (err and (' (' .. err .. ')') or '') }
+    end
+    return {
+      content = string.format(
+        'Note deleted successfully!\n\nID: %s\nPath: %s',
+        action.id,
+        file_path
+      ),
+    }
+  end
+
   local lines = read_lines(file_path)
   if lines == nil then
     return { error = 'failed to read note file: ' .. file_path }
   end
-
-  -- clear browser cache so next get_notes() re-reads from disk
-  browser.clear_cache()
 
   if action.action == 'update_title' then
     if not action.title or type(action.title) ~= 'string' then
@@ -239,6 +257,22 @@ function M.zettelkasten_update(action)
     if not found then
       return { error = 'old_text not found in note body.' }
     end
+
+  elseif action.action == 'override_content' then
+    if not action.content or type(action.content) ~= 'string' then
+      return { error = 'content is required for override_content action.' }
+    end
+
+    if #lines == 0 then
+      return { error = 'note file is empty.' }
+    end
+
+    -- preserve line 1 (title with ID), replace the rest with new content
+    local title_line = lines[1]
+    lines = { title_line, '' }
+    for _, line in ipairs(vim.split(action.content, '\n')) do
+      table.insert(lines, line)
+    end
   end
 
   ::done::
@@ -264,6 +298,8 @@ function M.zettelkasten_update(action)
     summary = summary .. '\nRemoved tags: ' .. table.concat(normalize_tags(action.tags), ', ')
   elseif action.action == 'replace_text' then
     summary = summary .. '\nReplaced: "' .. action.old_text .. '" -> "' .. action.new_text .. '"'
+  elseif action.action == 'override_content' then
+    summary = summary .. '\nContent length: ' .. #action.content .. ' characters'
   end
 
   return { content = summary }
@@ -291,6 +327,12 @@ Supports partial updates without needing to pass the full note content:
 4. replace_text - Find and replace text in the note body (title line is skipped)
    Example: @zk update id="2024-01-15-10-30-00" action="replace_text" old_text="old code" new_text="new code"
 
+5. delete_note - Delete the entire note file permanently
+   Example: @zk update id="2024-01-15-10-30-00" action="delete_note"
+
+6. override_content - Replace the entire note body with new content (title line with ID is preserved)
+   Example: @zk update id="2024-01-15-10-30-00" action="override_content" content="New body content here"
+
 Tags can be provided with or without # prefix. Use empty new_text to delete text.
 
 ⚠️ Only call this tool when the user explicitly requests to update a note.
@@ -304,7 +346,7 @@ Tags can be provided with or without # prefix. Use empty new_text to delete text
           },
           action = {
             type = 'string',
-            enum = { 'update_title', 'add_tags', 'remove_tags', 'replace_text' },
+            enum = { 'update_title', 'add_tags', 'remove_tags', 'replace_text', 'delete_note', 'override_content' },
             description = 'The update action to perform',
           },
           title = {
@@ -323,6 +365,10 @@ Tags can be provided with or without # prefix. Use empty new_text to delete text
           new_text = {
             type = 'string',
             description = 'Replacement text (required for replace_text action, use empty string to delete)',
+          },
+          content = {
+            type = 'string',
+            description = 'New body content for the note (required for override_content action, title line with ID is preserved)',
           },
         },
         required = { 'id', 'action' },
