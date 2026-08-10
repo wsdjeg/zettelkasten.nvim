@@ -116,10 +116,12 @@ function M.zettelkasten_update(action)
     replace_text = true,
     delete_note = true,
     override_content = true,
+    append_content = true,
+    add_reference = true,
   }
   if not action.action or not valid_actions[action.action] then
     return {
-      error = 'action is required and must be one of: update_title, add_tags, remove_tags, replace_text, delete_note, override_content.',
+      error = 'action is required and must be one of: update_title, add_tags, remove_tags, replace_text, delete_note, override_content, append_content, add_reference.',
     }
   end
 
@@ -273,6 +275,47 @@ function M.zettelkasten_update(action)
     for _, line in ipairs(vim.split(action.content, '\n')) do
       table.insert(lines, line)
     end
+
+  elseif action.action == 'append_content' then
+    if not action.content or type(action.content) ~= 'string' then
+      return { error = 'content is required for append_content action.' }
+    end
+
+    if #lines == 0 then
+      return { error = 'note file is empty.' }
+    end
+
+    -- ensure there's a blank line before appended content if last line isn't empty
+    if lines[#lines] ~= '' then
+      table.insert(lines, '')
+    end
+
+    -- append the new content lines
+    for _, line in ipairs(vim.split(action.content, '\n')) do
+      table.insert(lines, line)
+    end
+
+  elseif action.action == 'add_reference' then
+    if not action.reference_id or type(action.reference_id) ~= 'string' then
+      return { error = 'reference_id is required for add_reference action.' }
+    end
+
+    if #lines == 0 then
+      return { error = 'note file is empty.' }
+    end
+
+    -- build the reference link: [[target_id]] or [[target_id]] Display text
+    local ref_link = '[[' .. action.reference_id .. ']]'
+    if action.reference_text and type(action.reference_text) == 'string' and action.reference_text ~= '' then
+      ref_link = ref_link .. ' ' .. action.reference_text
+    end
+
+    -- ensure there's a blank line before the reference if last line isn't empty
+    if lines[#lines] ~= '' then
+      table.insert(lines, '')
+    end
+
+    table.insert(lines, ref_link)
   end
 
   ::done::
@@ -300,6 +343,10 @@ function M.zettelkasten_update(action)
     summary = summary .. '\nReplaced: "' .. action.old_text .. '" -> "' .. action.new_text .. '"'
   elseif action.action == 'override_content' then
     summary = summary .. '\nContent length: ' .. #action.content .. ' characters'
+  elseif action.action == 'append_content' then
+    summary = summary .. '\nAppended content length: ' .. #action.content .. ' characters'
+  elseif action.action == 'add_reference' then
+    summary = summary .. '\nAdded reference: [[' .. action.reference_id .. ']]'
   end
 
   return { content = summary }
@@ -310,7 +357,7 @@ function M.scheme()
     type = 'function',
     ['function'] = {
       name = 'zettelkasten_update',
-      description = [[
+      description = [==[
 Update an existing zettelkasten note. Use @zk update command.
 
 Supports partial updates without needing to pass the full note content:
@@ -333,10 +380,17 @@ Supports partial updates without needing to pass the full note content:
 6. override_content - Replace the entire note body with new content (title line with ID is preserved)
    Example: @zk update id="2024-01-15-10-30-00" action="override_content" content="New body content here"
 
+7. append_content - Append text to the end of the note body (title and existing content are preserved)
+   Example: @zk update id="2024-01-15-10-30-00" action="append_content" content="Additional text"
+
+8. add_reference - Add a reference link [[target_id]] to the note body, linking to another note
+   Example: @zk update id="2024-01-15-10-30-00" action="add_reference" reference_id="2024-01-10-08-00-00"
+   Optional: reference_text="Display text" for [[target_id]] Display text
+
 Tags can be provided with or without # prefix. Use empty new_text to delete text.
 
 ⚠️ Only call this tool when the user explicitly requests to update a note.
-]],
+]==],
       parameters = {
         type = 'object',
         properties = {
@@ -346,7 +400,7 @@ Tags can be provided with or without # prefix. Use empty new_text to delete text
           },
           action = {
             type = 'string',
-            enum = { 'update_title', 'add_tags', 'remove_tags', 'replace_text', 'delete_note', 'override_content' },
+            enum = { 'update_title', 'add_tags', 'remove_tags', 'replace_text', 'delete_note', 'override_content', 'append_content', 'add_reference' },
             description = 'The update action to perform',
           },
           title = {
@@ -368,7 +422,15 @@ Tags can be provided with or without # prefix. Use empty new_text to delete text
           },
           content = {
             type = 'string',
-            description = 'New body content for the note (required for override_content action, title line with ID is preserved)',
+            description = 'New body content for the note (required for override_content/append_content actions)',
+          },
+          reference_id = {
+            type = 'string',
+            description = 'The ID of the note to reference (required for add_reference action)',
+          },
+          reference_text = {
+            type = 'string',
+            description = 'Optional display text for the reference link (used with add_reference action)',
           },
         },
         required = { 'id', 'action' },

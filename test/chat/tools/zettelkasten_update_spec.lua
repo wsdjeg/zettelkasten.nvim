@@ -415,6 +415,227 @@ function TestZettelkastenUpdate:test_override_content_missing_content()
   lu.assertNotNil(result.error)
 end
 
+-- ============== append_content ==============
+
+function TestZettelkastenUpdate:test_append_content_basic()
+  create_note('2024-01-01-12-00-00', 'Test Note', nil, 'Original body')
+
+  local result = update_tool.zettelkasten_update({
+    id = '2024-01-01-12-00-00',
+    action = 'append_content',
+    content = 'Appended text',
+  })
+
+  lu.assertFalse(result.error ~= nil, 'should not return error')
+  local lines = read_file_lines(test_notes_dir .. '/2024-01-01-12-00-00.md')
+  -- line 1: title, line 2: empty, line 3: original body, line 4: empty separator, line 5: appended
+  lu.assertEquals(lines[1], '# 2024-01-01-12-00-00 Test Note')
+  lu.assertEquals(lines[3], 'Original body')
+  lu.assertEquals(lines[4], '')
+  lu.assertEquals(lines[5], 'Appended text')
+end
+
+function TestZettelkastenUpdate:test_append_content_multiline()
+  create_note('2024-01-01-12-00-00', 'Test Note', nil, 'Original')
+
+  update_tool.zettelkasten_update({
+    id = '2024-01-01-12-00-00',
+    action = 'append_content',
+    content = 'Line A\nLine B',
+  })
+
+  local lines = read_file_lines(test_notes_dir .. '/2024-01-01-12-00-00.md')
+  lu.assertEquals(lines[1], '# 2024-01-01-12-00-00 Test Note')
+  lu.assertEquals(lines[3], 'Original')
+  lu.assertEquals(lines[4], '')
+  lu.assertEquals(lines[5], 'Line A')
+  lu.assertEquals(lines[6], 'Line B')
+end
+
+function TestZettelkastenUpdate:test_append_content_preserves_title_and_tags()
+  create_note('2024-01-01-12-00-00', 'Test Note', { 'tag1' }, 'Body content')
+
+  update_tool.zettelkasten_update({
+    id = '2024-01-01-12-00-00',
+    action = 'append_content',
+    content = 'More content',
+  })
+
+  local lines = read_file_lines(test_notes_dir .. '/2024-01-01-12-00-00.md')
+  -- title and tags should be unchanged
+  lu.assertEquals(lines[1], '# 2024-01-01-12-00-00 Test Note')
+  lu.assertEquals(lines[2], 'tags: #tag1')
+  -- original body preserved
+  lu.assertEquals(lines[4], 'Body content')
+  -- appended content
+  lu.assertEquals(lines[5], '')
+  lu.assertEquals(lines[6], 'More content')
+end
+
+function TestZettelkastenUpdate:test_append_content_no_existing_body()
+  create_note('2024-01-01-12-00-00', 'Test Note', nil, nil)
+
+  local result = update_tool.zettelkasten_update({
+    id = '2024-01-01-12-00-00',
+    action = 'append_content',
+    content = 'First content',
+  })
+
+  lu.assertFalse(result.error ~= nil, 'should not return error')
+  local lines = read_file_lines(test_notes_dir .. '/2024-01-01-12-00-00.md')
+  lu.assertEquals(lines[1], '# 2024-01-01-12-00-00 Test Note')
+  -- line 2 is the empty line from create_note
+  -- last line is empty already, so no extra separator needed
+  lu.assertEquals(lines[#lines], 'First content')
+end
+
+function TestZettelkastenUpdate:test_append_content_empty_string()
+  create_note('2024-01-01-12-00-00', 'Test Note', nil, 'Body')
+
+  local result = update_tool.zettelkasten_update({
+    id = '2024-01-01-12-00-00',
+    action = 'append_content',
+    content = '',
+  })
+
+  -- empty content still valid - appends a blank line separator + empty
+  lu.assertFalse(result.error ~= nil, 'should not return error')
+end
+
+function TestZettelkastenUpdate:test_append_content_missing_content()
+  create_note('2024-01-01-12-00-00', 'Test Note')
+
+  local result = update_tool.zettelkasten_update({
+    id = '2024-01-01-12-00-00',
+    action = 'append_content',
+  })
+
+  lu.assertNotNil(result.error)
+end
+
+function TestZettelkastenUpdate:test_append_content_summary()
+  create_note('2024-01-01-12-00-00', 'Test Note', nil, 'Body')
+
+  local result = update_tool.zettelkasten_update({
+    id = '2024-01-01-12-00-00',
+    action = 'append_content',
+    content = 'Added text',
+  })
+
+  lu.assertNotNil(result.content)
+  lu.assertTrue(result.content:find('append_content') ~= nil)
+  lu.assertTrue(result.content:find('Added text') == nil) -- summary doesn't include content
+  lu.assertTrue(result.content:find('10 characters') ~= nil) -- "Added text" is 10 chars
+end
+
+-- ============== add_reference ==============
+
+function TestZettelkastenUpdate:test_add_reference_basic()
+  create_note('2024-01-01-12-00-00', 'Note A', nil, 'Some content')
+  create_note('2024-01-02-12-00-00', 'Note B')
+
+  local result = update_tool.zettelkasten_update({
+    id = '2024-01-01-12-00-00',
+    action = 'add_reference',
+    reference_id = '2024-01-02-12-00-00',
+  })
+
+  lu.assertFalse(result.error ~= nil, 'should not return error')
+  local lines = read_file_lines(test_notes_dir .. '/2024-01-01-12-00-00.md')
+  -- title preserved
+  lu.assertEquals(lines[1], '# 2024-01-01-12-00-00 Note A')
+  -- original body preserved
+  lu.assertEquals(lines[3], 'Some content')
+  -- reference link appended at the end
+  lu.assertEquals(lines[#lines], '[[2024-01-02-12-00-00]]')
+end
+
+function TestZettelkastenUpdate:test_add_reference_with_display_text()
+  create_note('2024-01-01-12-00-00', 'Note A', nil, 'Content')
+  create_note('2024-01-02-12-00-00', 'Note B')
+
+  update_tool.zettelkasten_update({
+    id = '2024-01-01-12-00-00',
+    action = 'add_reference',
+    reference_id = '2024-01-02-12-00-00',
+    reference_text = 'See Note B',
+  })
+
+  local lines = read_file_lines(test_notes_dir .. '/2024-01-01-12-00-00.md')
+  lu.assertEquals(lines[#lines], '[[2024-01-02-12-00-00]] See Note B')
+end
+
+function TestZettelkastenUpdate:test_add_reference_preserves_title_and_tags()
+  create_note('2024-01-01-12-00-00', 'Note A', { 'important' }, 'Body')
+  create_note('2024-01-02-12-00-00', 'Note B')
+
+  update_tool.zettelkasten_update({
+    id = '2024-01-01-12-00-00',
+    action = 'add_reference',
+    reference_id = '2024-01-02-12-00-00',
+  })
+
+  local lines = read_file_lines(test_notes_dir .. '/2024-01-01-12-00-00.md')
+  lu.assertEquals(lines[1], '# 2024-01-01-12-00-00 Note A')
+  lu.assertEquals(lines[2], 'tags: #important')
+  lu.assertEquals(lines[#lines], '[[2024-01-02-12-00-00]]')
+end
+
+function TestZettelkastenUpdate:test_add_reference_no_existing_body()
+  create_note('2024-01-01-12-00-00', 'Note A', nil, nil)
+
+  local result = update_tool.zettelkasten_update({
+    id = '2024-01-01-12-00-00',
+    action = 'add_reference',
+    reference_id = '2024-01-02-12-00-00',
+  })
+
+  lu.assertFalse(result.error ~= nil, 'should not return error')
+  local lines = read_file_lines(test_notes_dir .. '/2024-01-01-12-00-00.md')
+  lu.assertEquals(lines[1], '# 2024-01-01-12-00-00 Note A')
+  lu.assertEquals(lines[#lines], '[[2024-01-02-12-00-00]]')
+end
+
+function TestZettelkastenUpdate:test_add_reference_missing_reference_id()
+  create_note('2024-01-01-12-00-00', 'Note A')
+
+  local result = update_tool.zettelkasten_update({
+    id = '2024-01-01-12-00-00',
+    action = 'add_reference',
+  })
+
+  lu.assertNotNil(result.error)
+end
+
+function TestZettelkastenUpdate:test_add_reference_empty_reference_text_ignored()
+  create_note('2024-01-01-12-00-00', 'Note A', nil, 'Content')
+
+  update_tool.zettelkasten_update({
+    id = '2024-01-01-12-00-00',
+    action = 'add_reference',
+    reference_id = '2024-01-02-12-00-00',
+    reference_text = '',
+  })
+
+  local lines = read_file_lines(test_notes_dir .. '/2024-01-01-12-00-00.md')
+  -- empty reference_text should be ignored, no trailing space
+  lu.assertEquals(lines[#lines], '[[2024-01-02-12-00-00]]')
+end
+
+function TestZettelkastenUpdate:test_add_reference_summary()
+  create_note('2024-01-01-12-00-00', 'Note A', nil, 'Content')
+
+  local result = update_tool.zettelkasten_update({
+    id = '2024-01-01-12-00-00',
+    action = 'add_reference',
+    reference_id = '2024-01-02-12-00-00',
+  })
+
+  lu.assertNotNil(result.content)
+  lu.assertTrue(result.content:find('add_reference') ~= nil)
+  lu.assertTrue(result.content:find('%[%[2024%-01%-02%-12%-00%-00%]%]') ~= nil)
+end
+
 -- ============== error cases ==============
 
 function TestZettelkastenUpdate:test_missing_id()
@@ -447,6 +668,26 @@ function TestZettelkastenUpdate:test_note_not_found()
   lu.assertNotNil(result.error)
 end
 
+function TestZettelkastenUpdate:test_id_not_string()
+  local result = update_tool.zettelkasten_update({
+    id = 12345,
+    action = 'update_title',
+    title = 'New Title',
+  })
+
+  lu.assertNotNil(result.error)
+end
+
+function TestZettelkastenUpdate:test_missing_action()
+  create_note('2024-01-01-12-00-00', 'Test Note')
+
+  local result = update_tool.zettelkasten_update({
+    id = '2024-01-01-12-00-00',
+  })
+
+  lu.assertNotNil(result.error)
+end
+
 -- ============== scheme ==============
 
 function TestZettelkastenUpdate:test_scheme_returns_valid_structure()
@@ -465,11 +706,17 @@ function TestZettelkastenUpdate:test_scheme_required_fields()
   lu.assertTrue(vim.tbl_contains(required, 'action'))
 end
 
-function TestZettelkastenUpdate:test_scheme_includes_new_actions()
+function TestZettelkastenUpdate:test_scheme_includes_all_actions()
   local scheme = update_tool.scheme()
   local enum = scheme['function'].parameters.properties.action.enum
+  lu.assertTrue(vim.tbl_contains(enum, 'update_title'))
+  lu.assertTrue(vim.tbl_contains(enum, 'add_tags'))
+  lu.assertTrue(vim.tbl_contains(enum, 'remove_tags'))
+  lu.assertTrue(vim.tbl_contains(enum, 'replace_text'))
   lu.assertTrue(vim.tbl_contains(enum, 'delete_note'))
   lu.assertTrue(vim.tbl_contains(enum, 'override_content'))
+  lu.assertTrue(vim.tbl_contains(enum, 'append_content'))
+  lu.assertTrue(vim.tbl_contains(enum, 'add_reference'))
 end
 
 function TestZettelkastenUpdate:test_scheme_includes_content_param()
@@ -478,5 +725,14 @@ function TestZettelkastenUpdate:test_scheme_includes_content_param()
   lu.assertEquals(scheme['function'].parameters.properties.content.type, 'string')
 end
 
+function TestZettelkastenUpdate:test_scheme_includes_reference_params()
+  local scheme = update_tool.scheme()
+  lu.assertNotNil(scheme['function'].parameters.properties.reference_id)
+  lu.assertEquals(scheme['function'].parameters.properties.reference_id.type, 'string')
+  lu.assertNotNil(scheme['function'].parameters.properties.reference_text)
+  lu.assertEquals(scheme['function'].parameters.properties.reference_text.type, 'string')
+end
+
 -- Tests are collected and run by test/run.lua
+
 
