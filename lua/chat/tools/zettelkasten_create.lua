@@ -1,7 +1,5 @@
 local M = {}
 
-local config = require('chat.config')
-
 local zk_config = require('zettelkasten.config')
 local zk = require('zettelkasten')
 
@@ -98,18 +96,16 @@ function M.scheme()
       description = [[
 Create a new zettelkasten note. Use @zk create command.
 
-⚠️ CRITICAL RESTRICTIONS - READ CAREFULLY:
-
 This tool MUST ONLY be called when the user EXPLICITLY requests to create a note.
 
 VALID triggers (user MUST say something like):
 - "创建笔记" / "新建笔记" / "记录笔记"
-- "保存为笔记" / "保存这个想法"  
+- "保存为笔记" / "保存这个想法"
 - "@zk create" or "zk create"
 
-🚫 FORBIDDEN uses - DO NOT CALL THIS TOOL FOR:
+FORBIDDEN uses - DO NOT CALL THIS TOOL FOR:
 - Generating code snippets
-- Storing conversation summaries  
+- Storing conversation summaries
 - Saving answers or explanations
 - ANY automated or proactive purposes
 - ANY purpose other than explicit user request to create a note
@@ -147,3 +143,4 @@ Rules:
 end
 
 return M
+
