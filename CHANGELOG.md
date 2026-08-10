@@ -1,5 +1,35 @@
 # Changelog
 
+## [3.0.0](https://github.com/wsdjeg/zettelkasten.nvim/compare/v2.3.0...v3.0.0) (2026-08-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* **chat:** chat tool names changed from zettelkasten_create etc. to single zettelkasten with action parameter.
+
+### Features
+
+* **zettelkasten_update:** add delete_note and override_content actions ([f814040](https://github.com/wsdjeg/zettelkasten.nvim/commit/f814040c3e3b347dc3ac664efce1538435edf582))
+* **zk-get:** enhance [@zk](https://github.com/zk) get to return id, tags, references, back_references ([14f95f4](https://github.com/wsdjeg/zettelkasten.nvim/commit/14f95f4bed1677977c3bd4342c60f1a33ffb748b))
+* **zk-read:** add [@zk](https://github.com/zk) read tool to read note content by ID ([beaee7f](https://github.com/wsdjeg/zettelkasten.nvim/commit/beaee7fd893007f318c3e69be664865e23e67b77))
+* **zk-search:** add [@zk](https://github.com/zk) search tool for keyword search in title and body ([7a636db](https://github.com/wsdjeg/zettelkasten.nvim/commit/7a636dbbd003ebfea7a24c58628d160b10cca42e))
+* **zk-update:** add append_content and add_reference actions ([5caa356](https://github.com/wsdjeg/zettelkasten.nvim/commit/5caa356cb911f53d800a0bb292eddadafa0545bb))
+
+
+### Bug Fixes
+
+* **tools:** remove unused require('chat.config') causing chat.nvim failure ([dce3c2e](https://github.com/wsdjeg/zettelkasten.nvim/commit/dce3c2e9ea4bf38b29e834adf3b48dc22d540e07))
+
+
+### Code Refactoring
+
+* **chat:** merge all zk tools into single unified zettelkasten tool ([919921b](https://github.com/wsdjeg/zettelkasten.nvim/commit/919921bf02ca62fb57140c8f3479778bf7346a83))
+
+
+### Tests
+
+* **chat-tools:** add tests for [@zk](https://github.com/zk) tags tool ([e0dec7b](https://github.com/wsdjeg/zettelkasten.nvim/commit/e0dec7bc197a921d6ade34e8038c01751f07d886))
+
 ## [2.3.0](https://github.com/wsdjeg/zettelkasten.nvim/compare/v2.2.0...v2.3.0) (2026-07-18)
 
 
